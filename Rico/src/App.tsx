@@ -6,6 +6,7 @@ import ServicePage from './pages/ServicePage';
 import ExperiencePage from './pages/ExperiencePage';
 import GreetingPage from './pages/GreetingPage'
 import MobileOnlyWrapper from './components/MobileOnlyWrapper';
+import DataAnalysisPage from './pages/DataAnalysisPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/service" element={<ServicePage />} />
           <Route path="/experience" element={<ExperiencePage />} />
           <Route path="/greeting" element={<GreetingPage />} />
+          <Route path="/data-analysis" element={<DataAnalysisPage />} />
         </Routes>
       </Router>
     </MobileOnlyWrapper>    

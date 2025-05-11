@@ -31,6 +31,7 @@ const Sidebar: React.FC = () => {
   const menuItems = [
     { id: '/', label: 'Dashboard', icon: <HomeIcon /> },
     { id: '/reviews', label: 'Reviews', icon: <GridViewIcon /> },
+    { id: '/data-analysis', label: 'ניתוח נתונים', icon: <BarChartIcon /> },
     { id: '/analytics', label: 'Data Analysis', icon: <BarChartIcon /> },
     { id: '/optimization', label: 'Optimization Ideas', icon: <AssignmentIcon /> },
   ];
