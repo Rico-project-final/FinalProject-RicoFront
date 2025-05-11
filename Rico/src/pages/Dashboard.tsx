@@ -20,12 +20,12 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } f
 
 // Sample data for the chart
 const chartData = [
-  { month: 'Jan', food: 1, service: 1.2, overall: 0.8 },
-  { month: 'Feb', food: 1.3, service: 2.2, overall: 1.5 },
-  { month: 'Mar', food: 2.5, service: 1.8, overall: 1.2 },
-  { month: 'Apr', food: 1.2, service: 1, overall: 2.2 },
-  { month: 'May', food: 2.1, service: 0.5, overall: 1.5 },
-  { month: 'Jun', food: 2.2, service: 1.8, overall: 0.5 },
+  { month: 'ינו', food: 1, service: 1.2, overall: 0.8 },
+  { month: 'פבר', food: 1.3, service: 2.2, overall: 1.5 },
+  { month: 'מרץ', food: 2.5, service: 1.8, overall: 1.2 },
+  { month: 'אפר', food: 1.2, service: 1, overall: 2.2 },
+  { month: 'מאי', food: 2.1, service: 0.5, overall: 1.5 },
+  { month: 'יונ', food: 2.2, service: 1.8, overall: 0.5 },
 ];
 
 interface StatCardProps {
@@ -41,29 +41,30 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, percentChange, isIncr
     <Card elevation={0} sx={{ height: '100%', borderRadius: 2 }}>
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right' }}>
             {title}
           </Typography>
           <Box sx={{ backgroundColor: 'rgba(235, 235, 255, 0.8)', p: 1, borderRadius: '50%' }}>
             {icon}
           </Box>
         </Box>
-        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
+        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'right' }}>
           {value}
         </Typography>
-        <Box 
-          sx={{ 
-            display: 'flex', 
+        <Box
+          sx={{
+            display: 'flex',
             alignItems: 'center',
-            color: isIncrease ? 'success.main' : 'error.main'
+            color: isIncrease ? 'success.main' : 'error.main',
+            justifyContent: 'flex-end'
           }}
         >
-          {isIncrease ? 
-            <TrendingUpIcon fontSize="small" sx={{ mr: 0.5 }} /> : 
-            <TrendingDownIcon fontSize="small" sx={{ mr: 0.5 }} />
+          {isIncrease ?
+            <TrendingUpIcon fontSize="small" sx={{ ml: 0.5 }} /> :
+            <TrendingDownIcon fontSize="small" sx={{ ml: 0.5 }} />
           }
           <Typography variant="body2">
-            {percentChange}% {isIncrease ? 'Up' : 'Down'} from yesterday
+            {percentChange}% {isIncrease ? 'עלייה' : 'ירידה'} מאתמול
           </Typography>
         </Box>
       </CardContent>
@@ -78,14 +79,14 @@ interface ReviewCardProps {
 const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   return (
     <Box sx={{ py: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-      <Typography variant="body2" sx={{ mb: 2 }}>
+      <Typography variant="body2" sx={{ mb: 2, textAlign: 'right' }}>
         {review}
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button 
-          variant="outlined" 
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 1 }}>
+        <Button
+          variant="outlined"
           size="small"
-          sx={{ 
+          sx={{
             borderRadius: 2,
             borderColor: 'rgba(0,0,0,0.2)',
             color: 'text.primary',
@@ -93,12 +94,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             px: 2
           }}
         >
-          View Comment
+          הצג תגובה
         </Button>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           size="small"
-          sx={{ 
+          sx={{
             borderRadius: 2,
             borderColor: 'rgba(0,0,0,0.2)',
             color: 'text.primary',
@@ -106,7 +107,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
             px: 2
           }}
         >
-          Treatment Suggestion
+          הצעה לטיפול
         </Button>
       </Box>
     </Box>
@@ -115,16 +116,16 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
 
 const Dashboard: React.FC = () => {
   return (
-    <Box sx={{ p: 4, backgroundColor: '#f8f7f3', minHeight: '100vh' }}>
-      <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold' }}>
-        Dashboard
+    <Box sx={{ p: 4, backgroundColor: '#f8f7f3', minHeight: '100vh' }} dir="rtl">
+      <Typography variant="h4" component="h1" sx={{ mb: 4, fontWeight: 'bold', textAlign: 'right' }}>
+        לוח בקרה
       </Typography>
       
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
           <StatCard 
-            title="Total Clients" 
+            title="לקוחות" 
             value={112} 
             percentChange={8.5} 
             isIncrease={true}
@@ -133,7 +134,7 @@ const Dashboard: React.FC = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <StatCard 
-            title="Total Questionnaires" 
+            title="שאלונים" 
             value={100} 
             percentChange={4.3} 
             isIncrease={false}
@@ -142,7 +143,7 @@ const Dashboard: React.FC = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <StatCard 
-            title="Total Comments" 
+            title="תגובות" 
             value={52} 
             percentChange={1.8} 
             isIncrease={true}
@@ -153,33 +154,7 @@ const Dashboard: React.FC = () => {
       
       {/* Main Content */}
       <Grid container spacing={3}>
-        {/* Reviews Section */}
-        <Grid item xs={12} lg={7}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              borderRadius: 2, 
-              overflow: 'hidden',
-              mb: 3
-            }}
-          >
-            <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Reviews Added This Week
-              </Typography>
-            </Box>
-            
-            <ReviewCard 
-              review="The food served was very disappointing. The flavors were flat, the dishes were not seasoned enough, and some of the food even arrived cold. I expected much more considering the price we paid."
-            />
-            
-            <ReviewCard 
-              review="The food was excellent. The dishes were perfectly seasoned, the ingredients were fresh, and the flavors blended wonderfully. Everything was served on time and at the right temperature. A truly enjoyable culinary experience. We will definitely come back!"
-            />
-          </Paper>
-        </Grid>
-        
-        {/* Chart Section */}
+        {/* Chart Section - right */}
         <Grid item xs={12} lg={5}>
           <Paper 
             elevation={0} 
@@ -190,12 +165,12 @@ const Dashboard: React.FC = () => {
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                All Categories
+              <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
+                כל התחומים
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                <Typography variant="body2">This year</Typography>
-                <Box component="span" sx={{ ml: 1 }}>▼</Box>
+                <Typography variant="body2">שנה זו</Typography>
+                <Box component="span" sx={{ mr: 1 }}>▼</Box>
               </Box>
             </Box>
             
@@ -216,7 +191,7 @@ const Dashboard: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="food" 
-                  name="Food" 
+                  name="אוכל" 
                   stroke="#8884d8" 
                   strokeWidth={2}
                   activeDot={{ r: 8 }}
@@ -224,19 +199,45 @@ const Dashboard: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="service" 
-                  name="Service" 
+                  name="שירות" 
                   stroke="#e91e63" 
                   strokeWidth={2}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="overall" 
-                  name="Overall Experience" 
+                  name="חוויה כוללת" 
                   stroke="#82ca9d" 
                   strokeWidth={2}
                 />
               </LineChart>
             </ResponsiveContainer>
+          </Paper>
+        </Grid>
+        
+        {/* Reviews Section - left */}
+        <Grid item xs={12} lg={7}>
+          <Paper 
+            elevation={0} 
+            sx={{ 
+              borderRadius: 2, 
+              overflow: 'hidden',
+              mb: 3
+            }}
+          >
+            <Box sx={{ p: 3, borderBottom: '1px solid rgba(0,0,0,0.08)' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'right' }}>
+                תגובות שנוספו השבוע
+              </Typography>
+            </Box>
+            
+            <ReviewCard
+              review="האוכל שהוגש היה מאכזב מאוד. הטעמים היו שטוחים, המנות לא היו מתובלות מספיק, וחלק מהאוכל אפילו הגיע קר. ציפיתי להרבה יותר בהתחשב במחיר ששילמנו."
+            />
+            
+            <ReviewCard
+              review="האוכל היה מצוין! המנות היו מתובלות בצורה מושלמת, חומרי הגלם היו טריים והטעמים השתלבו נהדר. הכל הוגש בזמן ובטמפרטורה הנכונה, ממש חוויה קולינרית מהנה. בהחלט נחזור שוב!"
+            />
           </Paper>
         </Grid>
       </Grid>
