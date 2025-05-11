@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import "../styles/components/NavbarNG.css";
-import logo from "../assets/rico-logo.jpg";
+import "../styles/css/NavbarNG.css";
+import logo from "../assets/rico-logo.png";
 
 const NavbarNG: React.FC = () => {
   const navigate = useNavigate();

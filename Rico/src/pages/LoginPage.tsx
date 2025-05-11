@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/rico-logo.jpg';
-import '../styles/pages/LoginPage.css';
+import logo from '../assets/rico-logo.png';
+import '../styles/css/LoginPage.css';
 
 const LoginPage: React.FC = () => {
   const [phone, setPhone] = useState('');

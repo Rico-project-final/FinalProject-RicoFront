@@ -1,29 +1,28 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import FoodRatingPage from './pages/FoodRatingPage';
-import ServicePage from './pages/ServicePage';
-import ExperiencePage from './pages/ExperiencePage';
-import GreetingPage from './pages/GreetingPage'
-import MobileOnlyWrapper from './components/MobileOnlyWrapper';
-import DataAnalysisPage from './pages/DataAnalysisPage';
+import './App.css'
+import { Dashboard } from './pages/Dashboard'
+import { CommentsPage } from './pages/comment'
+import { DataAnalysisPage } from './pages/DataAnalysisPage'
+import { ImprovementSuggestionsPage } from './pages/ImprovementSuggestionsPage'
+import { ClientsPage } from './pages/ClientsPage'
+import { ToDoPage } from './pages/ToDoPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { LanguageProvider } from './context/LanguageContext'
 
 function App() {
   return (
-    <MobileOnlyWrapper>
+    <LanguageProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/food" element={<FoodRatingPage />} />
-          <Route path="/service" element={<ServicePage />} />
-          <Route path="/experience" element={<ExperiencePage />} />
-          <Route path="/greeting" element={<GreetingPage />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/comments" element={<CommentsPage />} />
           <Route path="/data-analysis" element={<DataAnalysisPage />} />
+          <Route path="/improvement" element={<ImprovementSuggestionsPage />} />
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/todo" element={<ToDoPage />} />
         </Routes>
       </Router>
-    </MobileOnlyWrapper>    
-  );
+    </LanguageProvider>
+  )
 }
 
-export default App;
+export default App

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/pages/LandingPage.css';
-import logo from '../assets/rico-logo.jpg';
+import '../styles/css/LandingPage.css';
+import logo from '../assets/rico-logo.png';
 import foodIcon from '../assets/food-icon.png';
 import serviceIcon from '../assets/service-icon.png';
 import experienceIcon from '../assets/experience-icon.png';
