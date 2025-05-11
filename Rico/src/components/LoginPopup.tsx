@@ -1,4 +1,4 @@
-import '../styles/components/LoginPopup.css';
+import '../styles/css/LoginPopup.css';
 
 interface LoginPopupProps {
   onClose: () => void;

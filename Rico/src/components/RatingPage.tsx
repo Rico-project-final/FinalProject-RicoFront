@@ -1,6 +1,6 @@
 import React from "react";
 import NavbarNG from "./NavbarNG";
-import "../styles/components/RatingPage.css";
+import "../styles/css/RatingPage.css";
 
 type RatingPageProps = {
   children: React.ReactNode;

@@ -1,43 +1,43 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Drawer, 
-  List, 
-  ListItem, 
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
   ListItemButton,
-  ListItemIcon, 
-  ListItemText, 
-  Typography, 
-  Divider 
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Divider,
 } from '@mui/material';
-import { 
-  Home as HomeIcon, 
-  GridView as GridViewIcon, 
-  BarChart as BarChartIcon, 
-  Assignment as AssignmentIcon, 
-  People as PeopleIcon, 
-  CheckBox as CheckBoxIcon, 
-  Settings as SettingsIcon, 
-  Logout as LogoutIcon 
+import {
+  HomeOutlined as HomeIcon,
+  GridViewOutlined as GridViewIcon,
+  BarChartOutlined as BarChartIcon,
+  AssignmentOutlined as AssignmentIcon,
+  PeopleOutline as PeopleIcon,
+  CheckBoxOutlined as CheckBoxIcon,
+  SettingsOutlined as SettingsIcon,
+  LogoutOutlined as LogoutIcon,
 } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../assets/rico-logo.png';
 
-const drawerWidth = 210;
+const drawerWidth = 240;
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const [activeItem, setActiveItem] = useState(location.pathname);
 
   const menuItems = [
-    { id: '/', label: 'Dashboard', icon: <HomeIcon /> },
-    { id: '/reviews', label: 'Reviews', icon: <GridViewIcon /> },
+    { id: '/dashboard', label: 'Dashboard', icon: <HomeIcon /> },
+    { id: '/reviews', label: 'תגובות', icon: <GridViewIcon /> },
     { id: '/data-analysis', label: 'ניתוח נתונים', icon: <BarChartIcon /> },
-    { id: '/analytics', label: 'Data Analysis', icon: <BarChartIcon /> },
-    { id: '/optimization', label: 'Optimization Ideas', icon: <AssignmentIcon /> },
+    { id: '/optimization', label: 'הצעות ייעול', icon: <AssignmentIcon /> },
   ];
 
   const pagesMenuItems = [
-    { id: '/customers', label: 'Customers', icon: <PeopleIcon /> },
+    { id: '/customers', label: 'לקוחות', icon: <PeopleIcon /> },
     { id: '/todo', label: 'To-Do', icon: <CheckBoxIcon /> },
   ];
 
@@ -50,11 +50,11 @@ const Sidebar: React.FC = () => {
     setActiveItem(id);
   };
 
-  const MenuItem = ({ 
-    item, 
-    isActive 
-  }: { 
-    item: { id: string; label: string; icon: React.ReactNode }; 
+  const MenuItem = ({
+    item,
+    isActive
+  }: {
+    item: { id: string; label: string; icon: React.ReactNode };
     isActive: boolean;
   }) => {
     return (
@@ -65,35 +65,40 @@ const Sidebar: React.FC = () => {
           onClick={() => handleItemClick(item.id)}
           selected={isActive}
           sx={{
-            borderRadius: 1,
+            borderRadius: 2,
             mb: 0.5,
-            color: isActive ? 'white' : 'rgba(255, 255, 255, 0.7)',
-            backgroundColor: isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+            color: isActive ? '#222' : '#222',
+            backgroundColor: isActive ? '#f3f1e7' : 'transparent',
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: '#f3f1e7',
             },
             '&.Mui-selected': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: '#f3f1e7',
+              color: '#222',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                backgroundColor: '#ece8d9',
               },
             },
+            minHeight: 44,
+            pl: 2,
+            pr: 2
           }}
         >
-          <ListItemIcon 
-            sx={{ 
-              minWidth: 40, 
-              color: isActive ? 'white' : 'rgba(255, 255, 255, 0.7)' 
+          <ListItemIcon
+            sx={{
+              minWidth: 36,
+              color: isActive ? '#222' : '#222',
             }}
           >
             {item.icon}
           </ListItemIcon>
-          <ListItemText 
-            primary={item.label} 
-            primaryTypographyProps={{ 
-              fontSize: 14,
-              fontWeight: isActive ? 500 : 400,
-            }} 
+          <ListItemText
+            primary={item.label}
+            primaryTypographyProps={{
+              fontSize: 15,
+              fontWeight: isActive ? 600 : 400,
+              fontFamily: 'inherit',
+            }}
           />
         </ListItemButton>
       </ListItem>
@@ -103,97 +108,69 @@ const Sidebar: React.FC = () => {
   return (
     <Drawer
       variant="permanent"
+      anchor="left"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: drawerWidth,
           boxSizing: 'border-box',
-          backgroundColor: '#1c2532',
-          color: 'white',
+          backgroundColor: '#fff',
+          color: '#222',
+          borderRight: '1px solid #f3f1e7',
         },
       }}
     >
-      <Box sx={{ p: 2 }}>
-        {/* Logo */}
-        <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              border: '2px solid rgba(255,255,255,0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(255,255,255,0.1)',
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" color="white">
-              R
-            </Typography>
-          </Box>
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            color="white"
-            sx={{ ml: 1 }}
-          >
-            RICO
-          </Typography>
-        </Box>
+      {/* לוגו */}
+      <Box sx={{ p: 2, pt: 3, pb: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img src={logo} alt="Rico Logo" style={{ width: 70, height: 70, objectFit: 'contain', marginBottom: 4 }} />
+        <Typography variant="h6" fontWeight="bold" color="#222" sx={{ letterSpacing: 2, mt: 1 }}>
+          RICO
+        </Typography>
       </Box>
-
-      {/* Main Menu */}
-      <Box sx={{ overflow: 'auto', px: 1, flex: 1 }}>
-        <List>
-          {menuItems.map((item) => (
-            <MenuItem
-              key={item.id}
-              item={item}
-              isActive={activeItem === item.id}
-            />
-          ))}
-        </List>
-
-        {/* Pages Section */}
-        <Box sx={{ mt: 2, mb: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{
-              px: 2,
-              py: 1,
-              color: 'rgba(255,255,255,0.5)',
-              fontWeight: 500,
-              display: 'block',
-            }}
-          >
-            PAGES
-          </Typography>
-          <List>
-            {pagesMenuItems.map((item) => (
-              <MenuItem
-                key={item.id}
-                item={item}
-                isActive={activeItem === item.id}
-              />
-            ))}
-          </List>
-        </Box>
-      </Box>
-
-      {/* Bottom Menu */}
-      <Box sx={{ p: 1, mt: 'auto' }}>
-        <List>
-          {bottomMenuItems.map((item) => (
-            <MenuItem
-              key={item.id}
-              item={item}
-              isActive={activeItem === item.id}
-            />
-          ))}
-        </List>
-      </Box>
+      <List sx={{ mt: 2 }}>
+        {menuItems.map((item) => (
+          <MenuItem
+            key={item.id}
+            item={item}
+            isActive={activeItem === item.id}
+          />
+        ))}
+      </List>
+      <Divider sx={{ my: 2, background: '#f3f1e7' }} />
+      <Typography
+        variant="caption"
+        sx={{
+          px: 3,
+          py: 1,
+          color: '#888',
+          fontWeight: 500,
+          display: 'block',
+          letterSpacing: 1,
+        }}
+      >
+        PAGES
+      </Typography>
+      <List>
+        {pagesMenuItems.map((item) => (
+          <MenuItem
+            key={item.id}
+            item={item}
+            isActive={activeItem === item.id}
+          />
+        ))}
+      </List>
+      <Box sx={{ flexGrow: 1 }} />
+      <Divider sx={{ my: 2, background: '#f3f1e7' }} />
+      <List>
+        {bottomMenuItems.map((item) => (
+          <MenuItem
+            key={item.id}
+            item={item}
+            isActive={activeItem === item.id}
+          />
+        ))}
+      </List>
     </Drawer>
   );
 };

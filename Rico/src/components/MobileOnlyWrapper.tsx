@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import '../styles/components/MobileOnlyWrapper.css'
+import '../styles/css/MobileOnlyWrapper.css'
 
 function MobileOnlyWrapper({ children }: React.PropsWithChildren<{}>) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
