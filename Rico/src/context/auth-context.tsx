@@ -56,34 +56,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
 
   // Check if user is already logged in on component mount
-  useEffect(() => {
+   useEffect(() => {
     const initAuth = async () => {
-      try {
-        const currentUser = authService.getCurrentUser();
-        if (currentUser) {
-          setUser(currentUser);
-        } else {
-          // If token exists but user info is missing, try to refresh
-          const token = authService.getToken();
-          if (token) {
-            try {
-              const { request } = authService.refreshToken();
-              const response = await request;
-              authService.saveAuth(response.data);
-              setUser(response.data.user);
-            } catch (err) {
-              console.error('Failed to refresh token:', err);
-              authService.clearAuth();
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Error initializing auth:', err);
-      } finally {
-        setIsLoading(false);
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
       }
+      setIsLoading(false);
     };
-    
     initAuth();
   }, []);
 

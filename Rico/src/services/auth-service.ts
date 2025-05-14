@@ -2,14 +2,11 @@ import axios from 'axios';
 import { User } from '../context/auth-context';
 
 // Define API base URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
-
+const API_URL = import.meta.env.VITE_API_URL;
 // Define auth data structure
 interface AuthData {
-  token: string;
-  refreshToken: string;
+  accessToken: string;
   user: User;
-  expiresAt: number;
 }
 
 // Define return type for API requests
@@ -52,18 +49,12 @@ const authService = {
     return this.createCancellableRequest('/auth/register', 'POST', formData);
   },
 
-  // No specific guest login endpoint needed
-
   // Login with Google token
   loginWithGoogleToken(credential: string): ApiRequest {
-    return this.createCancellableRequest('/auth/google', 'POST', { credential });
+    return this.createCancellableRequest('/auth/googleAuth', 'POST', { credential });
   },
 
-  // Refresh token
-  refreshToken(): ApiRequest {
-    const refreshToken = localStorage.getItem('refreshToken');
-    return this.createCancellableRequest('/auth/refresh-token', 'POST', { refreshToken });
-  },
+  
 
   // Logout
   logout(): ApiRequest {
@@ -72,17 +63,14 @@ const authService = {
 
   // Save authentication data
   saveAuth(data: AuthData): void {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem('expiresAt', data.expiresAt.toString());
-  },
 
-  // No specific saveGuestSession needed
+  },
 
   // Get current token
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('accessToken');
   },
 
   // Get current user
@@ -102,19 +90,10 @@ const authService = {
 
   // Clear auth data
   clearAuth(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
-    localStorage.removeItem('expiresAt');
   },
 
-  // Check if token is expired
-  isTokenExpired(): boolean {
-    const expiresAt = localStorage.getItem('expiresAt');
-    if (!expiresAt) return true;
-    
-    return Date.now() > parseInt(expiresAt, 10);
-  },
 
   // Get authenticated HTTP headers
   getAuthHeaders(): Record<string, string> {

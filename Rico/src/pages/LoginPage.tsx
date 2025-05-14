@@ -1,58 +1,40 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import logo from '../assets/rico-logo.png';
-import '../styles/css/LoginPage.css';
+import '../styles/css/LoginPage.css'; 
+import { GoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../context/auth-context';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login, loginWithGoogle } = useAuth();
 
-  const handleSendCode = (e: React.FormEvent) => {
-    e.preventDefault();
+  
 
+  // Handle Google login success
+  const handleGoogleSuccess = async (response: any) => {
+    if (response.credential) {
+      try {
+        setLoading(true);
+        await loginWithGoogle(response.credential);
+        navigate('/');
+      } catch (err: any) {
+        console.error('Google login error:', err);
+        setError(err.response?.data?.message || 'Google login failed');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
-
   return (
     <div className="login-root">
       <div className="login-container">
-        <button
-          onClick={() => navigate(-1)}
-          className="back-button"
-          aria-label="חזור"
-        >←</button>
         <img src={logo} alt="Rico Logo" className="logo" />
-        <h1 className="login-title">Login</h1>
-        <form
-          onSubmit={handleSendCode}
-          className="login-card"
-        >
-          <label className="login-label">
-            Phone Number
-          </label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-            placeholder="Enter your phone number"
-            className="login-input"
-            required
-          />
-          <button
-            type="submit"
-            className="login-btn"
-          >
-            send me code
-          </button>
-          <div className="login-register">
-            Don't have an account yet?{' '}
-            <span
-              className="login-register-link"
-              onClick={() => navigate('/register')}
-            >
-              Register here
-            </span>
-          </div>
-        </form>
+        <h1 className="login-title">Login</h1> 
+        <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google login failed')} />
+
       </div>
     </div>
   );

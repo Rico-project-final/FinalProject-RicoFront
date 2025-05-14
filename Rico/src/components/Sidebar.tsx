@@ -42,7 +42,6 @@ const Sidebar: React.FC = () => {
   ];
 
   const bottomMenuItems = [
-    { id: '/settings', label: 'Settings', icon: <SettingsIcon /> },
     { id: '/logout', label: 'Logout', icon: <LogoutIcon /> },
   ];
 
