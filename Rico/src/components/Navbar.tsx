@@ -34,7 +34,7 @@ export default function AppNavbar({ handleToggle, isDarkMode }: AppNavbarProps) 
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "primary.main", boxShadow: 3 }}>
+    <AppBar position="sticky" sx={{ bgcolor: "primary.main", boxShadow: 3 ,width: '100%'}}>
       <Toolbar>
         {/* Logo & Title */}
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
@@ -45,16 +45,6 @@ export default function AppNavbar({ handleToggle, isDarkMode }: AppNavbarProps) 
               alt="Logo"
               sx={{ width: 40, height: 40 }}
             />
-            <Typography
-              variant="h6"
-              sx={{
-                ml: 2,
-                color: "secondary.main",
-                fontFamily: "Roboto, sans-serif",
-              }}
-            >
-              Rico
-            </Typography>
           </Link>
         </Box>
 
@@ -90,7 +80,6 @@ export default function AppNavbar({ handleToggle, isDarkMode }: AppNavbarProps) 
               <Avatar alt={user.name} src={user.profileImage} />
               <Box sx={{ textAlign: "right" }}>
                 <Typography sx={{ fontWeight: "bold", fontSize: 14 }}>{user.name}</Typography>
-                <Typography sx={{ fontSize: 12, color: "#ddd" }}>{user.role}</Typography>
               </Box>
             </Box>
           )}

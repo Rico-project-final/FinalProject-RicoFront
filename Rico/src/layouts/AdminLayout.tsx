@@ -11,10 +11,10 @@ interface LayoutProps {
 const AdminLayout: React.FC<LayoutProps> = ({ children, handleToggle, isDarkMode }) => {
   return (
    
-    <Box sx={{display: 'flex', minHeight: '100vh'}} >
-       <Sidebar />
        <Box sx={{display: 'flex', flex:1 , flexDirection: 'column', minHeight: '100vh', background: '#f8f7f3'  }}>
         <AppNavbar handleToggle={handleToggle} isDarkMode={isDarkMode}/>
+        <Box sx={{display: 'flex', minHeight: '100vh'}} >
+       <Sidebar />
         {children}
     </Box>
     </Box>

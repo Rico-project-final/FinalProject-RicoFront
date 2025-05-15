@@ -1,8 +1,6 @@
-import axios from 'axios';
-import { User } from '../context/auth-context';
+import { User } from '../types';
+import apiClient, { CanceledError } from './axios'; // Use your configured Axios client
 
-// Define API base URL
-const API_URL = import.meta.env.VITE_API_URL;
 // Define auth data structure
 interface AuthData {
   accessToken: string;
@@ -17,19 +15,18 @@ interface ApiRequest {
 
 // Authentication service
 const authService = {
-  // Create a cancellable request
+  // Create a cancellable request using apiClient
   createCancellableRequest(url: string, method: string, data?: any): ApiRequest {
     const controller = new AbortController();
     const signal = controller.signal;
 
-    const request = axios({
-      url: `${API_URL}${url}`,
+    const request = apiClient.request({
+      url,
       method,
       data,
       signal,
       headers: {
         'Content-Type': data instanceof FormData ? 'multipart/form-data' : 'application/json',
-        Authorization: `Bearer ${this.getToken()}`,
       },
     });
 
@@ -54,8 +51,6 @@ const authService = {
     return this.createCancellableRequest('/auth/googleAuth', 'POST', { credential });
   },
 
-  
-
   // Logout
   logout(): ApiRequest {
     return this.createCancellableRequest('/auth/logout', 'POST');
@@ -65,7 +60,6 @@ const authService = {
   saveAuth(data: AuthData): void {
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('user', JSON.stringify(data.user));
-
   },
 
   // Get current token
@@ -84,8 +78,7 @@ const authService = {
         return null;
       }
     }
-    
-    return null; // If no user data found, return null (user will be treated as guest)
+    return null;
   },
 
   // Clear auth data
@@ -94,12 +87,10 @@ const authService = {
     localStorage.removeItem('user');
   },
 
-
   // Get authenticated HTTP headers
   getAuthHeaders(): Record<string, string> {
     const token = this.getToken();
     if (!token) return {};
-    
     return {
       Authorization: `Bearer ${token}`,
     };

@@ -48,8 +48,13 @@ export const Dashboard: React.FC = () => {
     { name: "Jun", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 3 },
   ];
 
+  const fetchAllUsers = async () => {
+    
+  }
+
   useEffect(() => {
     try {
+
       // Load stats/comments/user data here
     } catch (e: any) {
       setError("שגיאה בטעינת הנתונים");

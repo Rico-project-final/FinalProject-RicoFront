@@ -1,20 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import authService from '../services/auth-service';
+import {User} from '../types'
+import { UserRole } from '../types'; // Import UserRole enum
 
-// Define user types and roles
-export enum UserRole {
-  CLIENT = 'client',
-  ADMIN = 'admin'
-}
-
-// User interface
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  profileImage?: string;
-}
 
 // Define the shape of the context
 interface AuthContextType {
