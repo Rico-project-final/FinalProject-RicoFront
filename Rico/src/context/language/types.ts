@@ -1,12 +1,12 @@
 export type TranslationKeys = {
   dashboard: string;
   totalClients: string;
-  totalQuestionnaires: string;
-  totalComments: string;
+  totalTasks: string;
+  totalReviews: string;
   upFromYesterday: string;
   downFromYesterday: string;
-  commentsAddedThisWeek: string;
-  viewComment: string;
+  reviewsAddedThisWeek: string;
+  viewReview: string; 
   suggestTreatment: string;
   allAreas: string;
   thisYear: string;
@@ -26,13 +26,13 @@ export type TranslationKeys = {
   status: string;
   done: string;
   notDone: string;
-  comments: string;
+  reviews: string; 
   filterBy: string;
   date: string;
   clientName: string;
-  commentDesc: string;
+  reviewDesc: string; 
   resetFilter: string;
-  allComments: string;
+  allReviews: string; 
   filter: string;
   userRole: string;
   thisWeek: string;
@@ -47,6 +47,7 @@ export type TranslationKeys = {
   phone: string;
   searchClient: string;
 };
+
 
 export type Translations = {
   he: TranslationKeys;

@@ -1,5 +1,5 @@
 import apiClient, { CanceledError } from './axios';
-import { User } from '../types';
+import { User, Review } from '../types';
 
 export { CanceledError };
 
@@ -22,3 +22,12 @@ export const updateProfile = (data: Partial<User>) => {
 export const deleteProfile = () => {
   return apiClient.delete<{ message: string }>('/users/delete');
 };
+export const getDashboardStats = () => {
+  return apiClient.get<{
+    totalClients: number;
+    totalTasks: number;
+    totalReviews: number;
+    lastWeekReviews: Review[];
+    chartData : any;
+  }>('/users/dashboard');
+}

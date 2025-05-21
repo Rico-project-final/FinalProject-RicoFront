@@ -3,59 +3,70 @@ import { Box, Typography, Paper, Button, Divider } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
+import { getDashboardStats } from "../services/user-service";
+import { Review } from "../types";
 
 export const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<Array<{
-    label: keyof TranslationKeys;
-    icon: string;
-    changeColor: string;
-    changeText: keyof TranslationKeys;
-    bg: string;
-  }>>([
-    {
-      label: "totalClients",
-      icon: "👤",
-      changeColor: "green",
-      changeText: "upFromYesterday",
-      bg: "#f3f0ea",
-    },
-    {
-      label: "totalQuestionnaires",
-      icon: "📈",
-      changeColor: "red",
-      changeText: "downFromYesterday",
-      bg: "#eafaf3",
-    },
-    {
-      label: "totalComments",
-      icon: "💬",
-      changeColor: "green",
-      changeText: "upFromYesterday",
-      bg: "#faecea",
-    },
-  ]);
+ const [stats, setStats] = useState<Array<{
+  label: keyof TranslationKeys;
+  icon: string;
+  changeColor: string;
+  changeText: keyof TranslationKeys;
+  bg: string;
+}>>([
+  {
+    label: "totalClients",
+    icon: "👤",
+    changeColor: "green",
+    changeText: "upFromYesterday",
+    bg: "#f3f0ea",
+  },
+  {
+    label: "totalTasks",
+    icon: "📈",
+    changeColor: "red",
+    changeText: "downFromYesterday",
+    bg: "#eafaf3",
+  },
+  {
+    label: "totalReviews", 
+    icon: "💬",
+    changeColor: "green",
+    changeText: "upFromYesterday",
+    bg: "#faecea",
+  },
+]);
 
-  const [comments, setComments] = useState([]);
-  const [error, setError] = useState<string | null>(null);
-  const { lang, t } = useLanguage();
+const [totalStats, setTotalStats] = useState({ totalReviews: 0, totalClients: 0, totalTasks: 0 });
+const [reviews, setReviews] = useState<Review[]>([]);
+const [error, setError] = useState<string | null>(null);
+const [chartData, setChartData] = useState<any>();
+const { lang, t } = useLanguage();
 
-  const chartData = [
-    { name: "Jan", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 1 },
-    { name: "Feb", [t("food")]: 1, [t("service")]: 2, [t("experience")]: 2 },
-    { name: "Mar", [t("food")]: 2, [t("service")]: 2, [t("experience")]: 1 },
-    { name: "Apr", [t("food")]: 1, [t("service")]: 3, [t("experience")]: 2 },
-    { name: "Mai", [t("food")]: 3, [t("service")]: 2, [t("experience")]: 1 },
-    { name: "Jun", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 3 },
-  ];
+  // const chartData = [
+  //   { name: "Jan", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 1 },
+  //   { name: "Feb", [t("food")]: 1, [t("service")]: 2, [t("experience")]: 2 },
+  //   { name: "Mar", [t("food")]: 2, [t("service")]: 2, [t("experience")]: 1 },
+  //   { name: "Apr", [t("food")]: 1, [t("service")]: 3, [t("experience")]: 2 },
+  //   { name: "Mai", [t("food")]: 3, [t("service")]: 2, [t("experience")]: 1 },
+  //   { name: "Jun", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 3 },
+  // ];
 
-  const fetchAllUsers = async () => {
-    
+  const fetchDashboardData = async () => {
+  try {
+    const response = await getDashboardStats();
+    setTotalStats(response.data);
+    setReviews(response.data.lastWeekReviews);
+    setChartData(response.data.chartData);
+  } catch (e: any) {
+    setError("error while loading data");
   }
+};
 
   useEffect(() => {
     try {
 
-      // Load stats/comments/user data here
+      fetchDashboardData()
     } catch (e: any) {
       setError("שגיאה בטעינת הנתונים");
     }
@@ -79,7 +90,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-          {stats.map((stat) => (
+          {stats.map((stat,index) => (
             <Paper
               key={stat.label}
               sx={{
@@ -97,7 +108,7 @@ export const Dashboard: React.FC = () => {
               <Typography sx={{ fontSize: 14, color: "#888" }}>
                 {t(stat.label)}
               </Typography>
-              <Typography sx={{ fontSize: 28 }}>{stat.icon}</Typography>
+              <Typography sx={{ fontSize: 28 }}> {totalStats[stat.label as keyof typeof totalStats]} {stat.icon}</Typography>
             </Paper>
           ))}
         </Box>
@@ -116,20 +127,20 @@ export const Dashboard: React.FC = () => {
             <Typography
               sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}
             >
-              {t("commentsAddedThisWeek")}
+              {t("reviewsAddedThisWeek")}
             </Typography>
 
-            {comments.map((c, i) => (
+            {reviews.map((c, i) => (
               <Box key={i}>
                 <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                   <Button variant="outlined" sx={commentButtonSx}>
-                    {t("viewComment")}
+                    {t("viewReview")}
                   </Button>
                   <Button variant="outlined" sx={commentButtonSx}>
                     {t("suggestTreatment")}
                   </Button>
                 </Box>
-                {i < comments.length - 1 && <Divider sx={{ mb: 2 }} />}
+                {i < reviews.length - 1 && <Divider sx={{ mb: 2 }} />}
               </Box>
             ))}
           </Paper>

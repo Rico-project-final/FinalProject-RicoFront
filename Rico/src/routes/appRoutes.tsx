@@ -9,12 +9,13 @@ import { ToDoPage } from '../pages/ToDoPage';
 import  AdminLayout  from '../layouts/AdminLayout'; // ✅ make sure this path is correct
 import LoginPage from '../pages/LoginPage';
 import { useAuth } from '../context/auth-context';
+import LandingPage from '../pages/LandingPage';
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading  } = useAuth();
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -23,7 +24,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-
   return <>{children}</>;
 };
 interface AppRoutesProps {
@@ -33,15 +33,17 @@ interface AppRoutesProps {
 const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
   return (
     <Routes>
-      {/* <Route path ="/homePage" element={<Dashboard />}/> */}
+      {/* <Route path="/" element={<LandingPage />}/> */}
       <Route path="/login" element={<LoginPage />}/>
-      <Route path="/" element={
+      
+      <Route path="/dashboard" element={
         <PrivateRoute>
            <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
               <Dashboard />
             </AdminLayout>
         </PrivateRoute>
         } />
+      
       <Route path="/reviews" element={
         <PrivateRoute>
             <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
@@ -77,6 +79,8 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
               </AdminLayout>
         </PrivateRoute>
         } />
+
+        
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
