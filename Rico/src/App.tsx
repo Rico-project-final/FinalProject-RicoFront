@@ -1,27 +1,32 @@
 import './App.css'
-import { Dashboard } from './dashbord.tsx'
-import { CommentsPage } from './comment.tsx'
-import { DataAnalysisPage } from './DataAnalysisPage'
-import { ImprovementSuggestionsPage } from './ImprovementSuggestionsPage'
-import { ClientsPage } from './ClientsPage'
-import { ToDoPage } from './ToDoPage'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { LanguageProvider } from './LanguageContext'
+import { BrowserRouter as Router } from 'react-router-dom';
+import { LanguageProvider } from './context/language/LanguageContext'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ThemeProvider } from '@mui/material/styles';
+import AppRoutes from './routes/appRoutes'
+import { AuthProvider } from './context/auth-context';
+import { useState } from 'react';
+import { lightTheme, darkTheme } from './theme';
+
 
 function App() {
+   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleToggle = () => {
+    setIsDarkMode((prev) => !prev);
+  };
   return (
     <LanguageProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/comments" element={<CommentsPage />} />
-          <Route path="/data-analysis" element={<DataAnalysisPage />} />
-          <Route path="/improvement" element={<ImprovementSuggestionsPage />} />
-          <Route path="/clients" element={<ClientsPage />} />
-          <Route path="/todo" element={<ToDoPage />} />
-        </Routes>
-      </Router>
-    </LanguageProvider>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+          <AuthProvider>
+                  <Router>
+                      <AppRoutes handleToggle={handleToggle} isDarkMode={isDarkMode} />
+                  </Router>
+          </AuthProvider>
+          </ThemeProvider>
+      </GoogleOAuthProvider>
+     </LanguageProvider>
   )
 }
 

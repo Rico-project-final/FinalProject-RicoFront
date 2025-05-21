@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ricoLogo from './assets/rico-logo.jpg';
 import { useLanguage } from "./LanguageContext";
@@ -54,8 +54,15 @@ export const ToDoPage: React.FC = () => {
   const { lang, setLang } = useLanguage();
   const [currentUser] = useState({ name: "yuval miles", role: "Admin" });
   const t = translations[lang];
-  const [taskList, setTaskList] = useState(tasks);
+  const [taskList, setTaskList] = useState<Task[]>(() => {
+    const stored = localStorage.getItem("tasks");
+    return stored ? JSON.parse(stored) : tasks;
+  });
   const [newTask, setNewTask] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+  }, [taskList]);
 
   const handleAddTask = () => {
     if (newTask.trim()) {
@@ -63,8 +70,13 @@ export const ToDoPage: React.FC = () => {
       setNewTask("");
     }
   };
+
   const handleToggle = (id: number) => {
     setTaskList(taskList.map(task => task.id === id ? { ...task, done: !task.done } : task));
+  };
+
+  const handleDelete = (id: number) => {
+    setTaskList(taskList.filter(task => task.id !== id));
   };
 
   return (
@@ -99,7 +111,7 @@ export const ToDoPage: React.FC = () => {
         </nav>
       </aside>
       {/* Main Content */}
-      <main style={{ flex: 1, padding: 32 }}>
+      <main style={{ flex: 1, padding: 24 }}>
         {/* Header */}
         <h1 style={{ marginBottom: 24 }}>{t.title}</h1>
         {/* Add Task */}
@@ -108,6 +120,7 @@ export const ToDoPage: React.FC = () => {
             type="text"
             value={newTask}
             onChange={e => setNewTask(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleAddTask()}
             placeholder={t.task}
             style={{
               borderRadius: 20,
@@ -128,6 +141,7 @@ export const ToDoPage: React.FC = () => {
                 <th style={thStyle}>{t.task}</th>
                 <th style={thStyle}>{t.status}</th>
                 <th style={thStyle}></th>
+                <th style={thStyle}></th>
               </tr>
             </thead>
             <tbody>
@@ -137,6 +151,9 @@ export const ToDoPage: React.FC = () => {
                   <td style={tdStyle}>{task.done ? t.done : t.notDone}</td>
                   <td style={tdStyle}>
                     <input type="checkbox" checked={task.done} onChange={() => handleToggle(task.id)} />
+                  </td>
+                  <td style={tdStyle}>
+                    <button onClick={() => handleDelete(task.id)} style={{ background: "none", border: "none", cursor: "pointer" }}>🗑️</button>
                   </td>
                 </tr>
               ))}

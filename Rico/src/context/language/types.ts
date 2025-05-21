@@ -1,0 +1,55 @@
+export type TranslationKeys = {
+  dashboard: string;
+  totalClients: string;
+  totalTasks: string;
+  totalReviews: string;
+  upFromYesterday: string;
+  downFromYesterday: string;
+  reviewsAddedThisWeek: string;
+  viewReview: string; 
+  suggestTreatment: string;
+  allAreas: string;
+  thisYear: string;
+  search: string;
+  pages: string;
+  responses: string;
+  dataAnalysis: string;
+  optimizationSuggestions: string;
+  clients: string;
+  toDo: string;
+  food: string;
+  service: string;
+  experience: string;
+  settings: string;
+  logout: string;
+  task: string;
+  status: string;
+  done: string;
+  notDone: string;
+  reviews: string; 
+  filterBy: string;
+  date: string;
+  clientName: string;
+  reviewDesc: string; 
+  resetFilter: string;
+  allReviews: string; 
+  filter: string;
+  userRole: string;
+  thisWeek: string;
+  all: string;
+  customertitle: string;
+  addTask: string;
+  suggestion: string;
+  improvement: string;
+  todo: string;
+  id: string;
+  name: string;
+  phone: string;
+  searchClient: string;
+};
+
+
+export type Translations = {
+  he: TranslationKeys;
+  en: TranslationKeys;
+};
