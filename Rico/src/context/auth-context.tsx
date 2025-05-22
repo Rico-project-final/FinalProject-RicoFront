@@ -76,29 +76,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Register function
   const register = async (name: string, email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('password', password);
-    
-    try {
-      const { request } = authService.register(formData);
-      const response = await request;
-      
-      authService.saveAuth(response.data);
-      setUser(response.data.user);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  setIsLoading(true);
+  setError(null);
 
-  // We don't need a separate loginAsGuest function
-  // Users are considered guests by default when not authenticated
+  try {
+    const { request } = authService.register({ name, email, password });
+    const response = await request;
+
+    authService.saveAuth(response.data);
+    setUser(response.data.user);
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Registration failed');
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // Logout function
   const logout = async () => {

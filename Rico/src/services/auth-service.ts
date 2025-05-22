@@ -42,9 +42,9 @@ const authService = {
   },
 
   // Register a new user
-  register(formData: FormData): ApiRequest {
-    return this.createCancellableRequest('/auth/register', 'POST', formData);
-  },
+  register(data: { email: string; password: string; name?: string }): ApiRequest {
+  return this.createCancellableRequest('/auth/register', 'POST', data);
+},
 
   // Login with Google token
   loginWithGoogleToken(credential: string): ApiRequest {

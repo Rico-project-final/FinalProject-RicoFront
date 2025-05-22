@@ -10,7 +10,7 @@ export type ReviewCategory = 'food' | 'service' | 'overall';
 // POST /reviews/create (user or guest)
 export const createReview = (data: {
   text: string;
-  category: ReviewCategory;
+  // category: ReviewCategory;
 }) => {
   return apiClient.post<Review>('/reviews/create', data);
 };

@@ -46,6 +46,22 @@ export type TranslationKeys = {
   name: string;
   phone: string;
   searchClient: string;
+  login: string;
+  email: string;
+  password: string;
+  loginWithEmail: string;
+  register: string;
+  loginError: string;
+  welcome: string;
+  helpImprove: string;
+  shareExperience: string;
+  yourFeedback: string;
+  noAccount:string;
+  alreadyHaveAccount:string;
+  submitFeedback: string;
+  tellUs: string;
+  
+
 };
 
 

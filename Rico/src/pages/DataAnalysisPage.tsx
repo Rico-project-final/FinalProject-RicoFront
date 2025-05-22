@@ -141,7 +141,7 @@ const CommentsColumn: React.FC<{
         textAlign="center"
         sx={{ mb: 2 }}
       >
-        {t("comments")}
+        {t("reviews")}
       </Typography>
 
       {comments.map((comment, idx) => (

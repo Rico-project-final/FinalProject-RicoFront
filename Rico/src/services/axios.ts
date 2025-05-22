@@ -1,4 +1,5 @@
 import axios, { CanceledError } from "axios";
+import authService from './auth-service';
 
 // יצוא השגיאה לשימוש במקומות אחרים
 export { CanceledError };
@@ -40,6 +41,8 @@ apiClient.interceptors.response.use(
 
     // Handle 403 Forbidden - Invalid or expired token
     if (status === 403 && message === "Invalid or expired token") {
+      authService.clearAuth();
+
       if (!window.location.pathname.includes("/login")) {
         window.location.href = "/login";
       }

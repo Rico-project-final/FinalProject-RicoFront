@@ -10,6 +10,7 @@ import  AdminLayout  from '../layouts/AdminLayout'; // ✅ make sure this path i
 import LoginPage from '../pages/LoginPage';
 import { useAuth } from '../context/auth-context';
 import LandingPage from '../pages/LandingPage';
+import GreetingPage from '../pages/GreetingPage';
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
@@ -33,9 +34,9 @@ interface AppRoutesProps {
 const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
   return (
     <Routes>
-      {/* <Route path="/" element={<LandingPage />}/> */}
+      <Route path="/" element={<LandingPage />}/>
       <Route path="/login" element={<LoginPage />}/>
-      
+      <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={
         <PrivateRoute>
            <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>

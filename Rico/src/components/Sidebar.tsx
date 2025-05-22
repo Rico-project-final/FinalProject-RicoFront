@@ -18,11 +18,13 @@ import {
   CheckBoxOutlined as CheckBoxIcon,
   LogoutOutlined as LogoutIcon,
 } from '@mui/icons-material';
-import { Link, useLocation } from 'react-router-dom';
-
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth-context';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [activeItem, setActiveItem] = useState(location.pathname);
 
   const menuItems = [
@@ -41,8 +43,12 @@ const Sidebar: React.FC = () => {
     { id: '/logout', label: 'Logout', icon: <LogoutIcon /> },
   ];
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = async (id: string) => {
     setActiveItem(id);
+    if (id === '/logout') {
+      await logout();
+      navigate('/'); // Redirect to home or login page
+    }
   };
 
   const MenuItem = ({
@@ -54,8 +60,8 @@ const Sidebar: React.FC = () => {
   }) => (
     <ListItem disablePadding>
       <ListItemButton
-        component={Link}
-        to={item.id}
+        component={item.id === '/logout' ? 'button' : Link}
+        to={item.id !== '/logout' ? item.id : undefined}
         onClick={() => handleItemClick(item.id)}
         selected={isActive}
         sx={{
