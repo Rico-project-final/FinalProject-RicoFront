@@ -100,12 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Call logout API if user is authenticated
       if (user) {
         const { request } = await authService.logout();
+        authService.clearAuth();
+        setUser(null);
         // We don't need to await this, as we want to log out immediately
         request.catch(err => console.error('Logout error:', err));
       }
-    } finally {
-      authService.clearAuth();
-      setUser(null);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Logout failed');
     }
   };
 
