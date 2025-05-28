@@ -35,3 +35,21 @@ export interface Review {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ReviewAnalysis extends Document {
+  reviewId:string;
+  userId?: string | null | {
+    _id: string;
+    name: string;
+    email: string;
+  }; 
+  text: string; 
+  category: 'food' | 'service' | 'overall';
+  sentiment: 'positive' | 'neutral' | 'negative'; 
+  analysisSummary: string; 
+  suggestions?: string; 
+  adminResponse?: string;
+  isResolved: boolean; 
+  createdAt: Date;
+  updatedAt: Date;
+}

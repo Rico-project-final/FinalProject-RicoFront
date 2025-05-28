@@ -1,4 +1,6 @@
 export type TranslationKeys = {
+  positive: string;
+  negative: string;
   dashboard: string;
   totalClients: string;
   totalTasks: string;

@@ -2,6 +2,8 @@ import { Translations } from './types';
 
 export const translations: Translations = {
   he: {
+    positive : "חיוביות",
+    negative : "שליליות",
     dashboard: "דשבורד",
     totalClients: "סך כל הלקוחות",
     totalTasks: "סך כל המטלות",
@@ -66,6 +68,8 @@ export const translations: Translations = {
 
   },
   en: {
+    positive : "Positive",
+    negative : "Negative",
     dashboard: "Dashboard",
     totalClients: "Total Clients",
     totalTasks: "Total Tasks",
