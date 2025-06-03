@@ -29,3 +29,7 @@ export const getReviewById = (reviewId: string) => {
 export const deleteReview = (reviewId: string) => {
   return apiClient.delete<{ message: string }>(`/reviews/delete/${reviewId}`);
 };
+
+export const triggerAllReviewAnalyses = () => {
+  return apiClient.post("/reviews/triggerAll")
+};

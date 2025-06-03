@@ -67,6 +67,7 @@ export const translations: Translations = {
     tellUs: "שתף אותנו בחוויותיך",
     title: "כותרת",
     selectDueDate : "בחר תאריך סיום",
+    Analyze : "נתח נתונים",
 
   },
   en: {
@@ -134,6 +135,7 @@ export const translations: Translations = {
     alreadyHaveAccount: "Already have an account?",
     submitFeedback : "Submit Feedback",
     tellUs: "Tell us about your experience",
-    selectDueDate : "Select due date"
+    selectDueDate : "Select due date",
+    Analyze : "Analyze",
   }
 };

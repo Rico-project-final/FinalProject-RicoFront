@@ -64,6 +64,7 @@ export type TranslationKeys = {
   tellUs: string;
   title:string;
   selectDueDate:string;
+  Analyze:string;
   
 
 };

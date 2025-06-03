@@ -13,7 +13,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { getAllReviews } from "../services/review-service";
+import { getAllReviews , triggerAllReviewAnalyses} from "../services/review-service";
 import { Review } from "../types";
 
 export const CommentsPage: React.FC = () => {
@@ -60,11 +60,17 @@ export const CommentsPage: React.FC = () => {
     setFilteredReviews(filtered);
   };
 
+
   const resetFilters = () => {
     setNameFilter("");
     setDateFilter("");
     setFilteredReviews(allReviews);
   };
+
+  const handleAllReviewAnalysis = async () => {
+        await triggerAllReviewAnalyses();
+   };
+
 
   return (
     <Box
@@ -106,6 +112,9 @@ export const CommentsPage: React.FC = () => {
             }}
           >
             {t("resetFilter")}
+          </Button>
+          <Button variant="outlined" onClick={handleAllReviewAnalysis} sx={{ ...filterBtnSx, color: 'green' }}>
+            {t("Analyze")}
           </Button>
         </Box>
 
