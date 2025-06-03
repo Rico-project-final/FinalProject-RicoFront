@@ -42,7 +42,7 @@ const authService = {
   },
 
   // Register a new user
-  register(data: { email: string; password: string; name?: string }): ApiRequest {
+  register(data: { email: string; password: string; name?: string , phone?:string }): ApiRequest {
   return this.createCancellableRequest('/auth/register', 'POST', data);
 },
 

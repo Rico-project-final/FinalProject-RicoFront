@@ -13,8 +13,9 @@ const LandingPage: React.FC = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const { t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated ,logout  } = useAuth();
   const navigate = useNavigate();
+
     useEffect(() => {
       if (user) {
         if (user.role === 'admin') {
@@ -48,7 +49,7 @@ const LandingPage: React.FC = () => {
       }}
     >
       {/* Login Button - top right */}
-      {!isAuthenticated && (
+      {!isAuthenticated ? (
         <Button
           onClick={() => setLoginOpen(true)}
           sx={{
@@ -69,7 +70,28 @@ const LandingPage: React.FC = () => {
         >
           {t("login")}
         </Button>
-      )}
+      ):<Button
+          onClick={logout}
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            background: '#fff',
+            borderRadius: '1rem',
+            padding: '0.5rem 1rem',
+            fontSize: '1rem',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            color: 'black',
+            textTransform: 'none',
+            '&:hover': {
+              background: '#eee',
+            },
+          }}
+        >
+          {t("logout")}
+        </Button>
+
+    }
 
       {/* Login Modal */}
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />

@@ -1,25 +1,86 @@
-import React, { useState } from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+} from "@mui/material";
 import { useLanguage } from "../context/language/LanguageContext";
-
-const suggestions = [
-  "הצעת בקרת איכות מחמירה במטבח: לבצע בדיקות איכות יזומות של מנות במטבח בסטנדרטים שמסעדה מציבה לעצמה.",
-  "שיפור תהליך העברת ההזמנות במטבח: לקבוע את חלון הזמן המומלץ כך שלא ימתינו זמן רב לפני ההגשה.",
-  "הקפדה על ניקיון ותחזוקה תדירה של הציוד: לבדוק תקינות של ציוד במטבח ולוודא ניקיון ואחסון מהירים של הכלים שמסופקים למטבח.",
-  "הצבת עמדות לשיפור חוויית הלקוח: להציב עמדות שירות עצמי ללקוחות או עמדות קופה על חשבון הבית, במטרה לשפר את חוויית הלקוח.",
-  "טיפוח צוות המלצרים ושיפור הכשרתם: להעניק הכשרות מקצועיות לצוות המלצרים, לעודד אותם להציע את התפריט ולבחון אותם בשיפור.",
-  "שיפור תפריט המסעדה: לבצע סקרי שביעות רצון ללקוחות כדי להוציא מנות שאינן פופולריות ולהוסיף מנות חדשות ומעניינות.",
-  "ניהול מלאי חכם: לעקוב אחרי מלאי המוצרים במטבח, לוודא שמנות לא אוזלות בזמן או שיש זמן תגובה מהיר לשחזור.",
-  "הקפדה על דיוק בהזמנות: להקפיד על בדיקת הזמנות לפני ההגשה, בשל דיוק הזמנות על כל מנה ואחידות של האוכל.",
-  "שיפור בתיאום בין המטבח למלצרים: להקים ערוץ תקשורת מהיר להעלאת בעיות מהמטבח בהתאם לדרישות הלקוחות.",
-];
+import {
+  getAllReviewAnalyses,
+  updateReviewAnalysisResolved,
+} from "../services/reviewAnalaysis-service";
+import { createTask } from "../services/task-service";
+import { ReviewAnalysis } from "../types";
+import DueDateModal from "../components/dueDateModal";
 
 export const ImprovementSuggestionsPage: React.FC = () => {
   const { lang, t } = useLanguage();
-  const [checked, setChecked] = useState(Array(suggestions.length).fill(false));
+  const [reviewAnalaysis, setReviewAnalaysis] = useState<ReviewAnalysis[]>([]);
 
-  const handleCheck = (idx: number) => {
-    setChecked((prev) => prev.map((v, i) => (i === idx ? !v : v)));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<string>("");
+  const [selectedSummary, setSelectedSummary] = useState<string>("");
+  const [dueDate, setDueDate] = useState<string>("");
+
+  const fetchAllReviewAnalyses = async () => {
+    try {
+      const response = await getAllReviewAnalyses();
+      setReviewAnalaysis(response.data);
+    } catch (error) {
+      console.error("Failed to fetch review analyses", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllReviewAnalyses();
+  }, []);
+
+  const handleClickSuggestion = (reviewId: string) => {
+    const review = reviewAnalaysis.find((r) => r.reviewId === reviewId);
+    if (!review) return;
+
+    setSelectedReviewId(reviewId);
+    setSelectedSuggestion(review.suggestions || "New Suggestion");
+    setSelectedSummary(review.analysisSummary);
+    setIsModalOpen(true);
+  };
+
+  const handleCreateTask = async (selectedDueDate: string) => {
+    if (!selectedReviewId) return;
+
+    try {
+      await updateReviewAnalysisResolved(selectedReviewId);
+
+      await createTask({
+        title: selectedSuggestion,
+        description: selectedSummary,
+        relatedReview: selectedReviewId,
+        isCompleted: false,
+        dueDate: selectedDueDate,
+        createdBy: "admin", // Replace with real userId from context
+      });
+  setReviewAnalaysis(prev =>
+        prev.map(review =>
+          review.reviewId === selectedReviewId
+            ? { ...review, isResolved: true }
+            : review
+        )
+      );
+      setIsModalOpen(false);
+      setDueDate("");
+      setSelectedReviewId(null);
+      fetchAllReviewAnalyses();
+    } catch (err) {
+      console.error("Failed to create task:", err);
+    }
   };
 
   return (
@@ -56,22 +117,31 @@ export const ImprovementSuggestionsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {suggestions.map((s, i) => (
-                <TableRow key={i}>
-                  <TableCell align="center">
-                    <Checkbox
-                      checked={checked[i]}
-                      onChange={() => handleCheck(i)}
-                      color="primary"
-                    />
-                  </TableCell>
-                  <TableCell sx={{ py: 1.5 }}>{s}</TableCell>
-                </TableRow>
-              ))}
+              {reviewAnalaysis
+                .filter((review) => review.isResolved === false)
+                .map((s, i) => (
+                  <TableRow key={i}>
+                    <TableCell align="center">
+                      <Button onClick={() => handleClickSuggestion(s.reviewId)}>
+                        {t("addTask")}
+                      </Button>
+                    </TableCell>
+                    <TableCell sx={{ py: 1.5 }}>{s.suggestions}</TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Box>
+
+      <DueDateModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleCreateTask}
+        dueDate={dueDate}
+        setDueDate={setDueDate}
+        title={t("selectDueDate")}
+      />
     </Box>
   );
 };

@@ -12,3 +12,7 @@ export const getAllReviewAnalyses = () => {
 export const getReviewAnalysisById = (reviewId: string) => {
   return apiClient.get<ReviewAnalysis>(`/analysis/${reviewId}`);
 };
+
+export const updateReviewAnalysisResolved = (reviewId: string) => {
+  return apiClient.post<ReviewAnalysis>(`/analysis/update/${reviewId}`);
+};

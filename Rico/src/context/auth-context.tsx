@@ -14,7 +14,7 @@ interface AuthContextType {
   isClient: boolean;
   isGuest: boolean; // Keeping this for convenience, but will calculate differently
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string , phone:string) => Promise<void>;
   logout: () => void;
   loginWithGoogle: (credential: string) => Promise<void>;
   clearError: () => void;
@@ -75,12 +75,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name : string, email : string, password : string , phone : string ) => {
   setIsLoading(true);
   setError(null);
 
   try {
-    const { request } = authService.register({ name, email, password });
+    const { request } = authService.register({ name, email, password , phone });
     const response = await request;
 
     authService.saveAuth(response.data);

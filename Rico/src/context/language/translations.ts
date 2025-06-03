@@ -65,9 +65,12 @@ export const translations: Translations = {
     alreadyHaveAccount: "כבר יש לך חשבון?",
     submitFeedback : "שלח משוב",
     tellUs: "שתף אותנו בחוויותיך",
+    title: "כותרת",
+    selectDueDate : "בחר תאריך סיום",
 
   },
   en: {
+    title: "title",
     positive : "Positive",
     negative : "Negative",
     dashboard: "Dashboard",
@@ -131,5 +134,6 @@ export const translations: Translations = {
     alreadyHaveAccount: "Already have an account?",
     submitFeedback : "Submit Feedback",
     tellUs: "Tell us about your experience",
+    selectDueDate : "Select due date"
   }
 };

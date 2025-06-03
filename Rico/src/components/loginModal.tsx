@@ -25,6 +25,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+
   const [password, setPassword] = useState('');
 
   const {
@@ -62,7 +64,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const handleRegister = async () => {
     clearError();
     try {
-      await register(name, email, password);
+      await register(name, email, password, phone);
+
       onClose();
       alert(`${t('welcome')}, ${name}!`);
     } catch (err) {
@@ -117,6 +120,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isRegisterMode && (
+            <>
             <TextField
               label={t('name')}
               variant="outlined"
@@ -125,6 +129,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
               onChange={(e) => setName(e.target.value)}
               sx={{ backgroundColor: 'white', borderRadius: 1 }}
             />
+            <TextField
+              label={t('phone')}
+              variant="outlined"
+              fullWidth
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              sx={{ backgroundColor: 'white', borderRadius: 1 }}
+            />
+            </>
           )}
           <TextField
             label={t('email')}

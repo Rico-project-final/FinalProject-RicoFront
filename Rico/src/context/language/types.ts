@@ -62,6 +62,8 @@ export type TranslationKeys = {
   alreadyHaveAccount:string;
   submitFeedback: string;
   tellUs: string;
+  title:string;
+  selectDueDate:string;
   
 
 };
