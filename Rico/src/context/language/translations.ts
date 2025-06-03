@@ -67,6 +67,13 @@ export const translations: Translations = {
     tellUs: "שתף אותנו בחוויותיך",
     title: "כותרת",
     selectDueDate : "בחר תאריך סיום",
+    contact : "צור קשר",
+    priority: "דחיפות",
+    low:'נמוכה',
+    high:'גבוהה',
+    medium:'בינונית',
+    delete: "מחק",
+    actions: "פעולות",
 
   },
   en: {
@@ -134,6 +141,13 @@ export const translations: Translations = {
     alreadyHaveAccount: "Already have an account?",
     submitFeedback : "Submit Feedback",
     tellUs: "Tell us about your experience",
-    selectDueDate : "Select due date"
+    selectDueDate : "Select due date",
+    contact : "Contact",
+    priority: "priority",
+    low:'low',
+    high:'high',
+    medium:'meduim',
+    delete : "Delete",
+    actions: "Actions",
   }
 };

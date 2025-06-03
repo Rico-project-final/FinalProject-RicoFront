@@ -16,13 +16,13 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading  } = useAuth();
+  const { isAuthenticated, isLoading ,isAdmin  } = useAuth();
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  if (!isAuthenticated) {
+  if (!isAdmin) {
     return <Navigate to="/login" />;
   }
   return <>{children}</>;

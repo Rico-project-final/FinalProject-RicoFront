@@ -120,7 +120,7 @@ export const ImprovementSuggestionsPage: React.FC = () => {
               {reviewAnalaysis
                 .filter((review) => review.isResolved === false)
                 .map((s, i) => (
-                  <TableRow key={i}>
+                  s.suggestions? (<TableRow key={i}>
                     <TableCell align="center">
                       <Button onClick={() => handleClickSuggestion(s.reviewId)}>
                         {t("addTask")}
@@ -128,8 +128,10 @@ export const ImprovementSuggestionsPage: React.FC = () => {
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>{s.suggestions}</TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
+                  ): null
+
+                ))}            
+                </TableBody>
           </Table>
         </TableContainer>
       </Box>
