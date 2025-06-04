@@ -15,11 +15,13 @@ export enum UserRole {
   ADMIN = 'admin'
 }
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  profileImage?: string;
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    password: string;
+    profileImage: string;
+    role: 'admin' | 'customer';
 }
 export type ReviewCategory = 'food' | 'service' | 'overall';
 

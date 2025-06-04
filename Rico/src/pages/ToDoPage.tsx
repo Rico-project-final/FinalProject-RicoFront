@@ -16,19 +16,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLanguage } from "../context/language/LanguageContext";
-
-export type Task = {
-  _id: string;
-  title: string;
-  description?: string;
-  relatedReview?: string;
-  isCompleted: boolean;
-  createdBy: string;
-  dueDate?: string;
-  priority?: "low" | "medium" | "high";
-  createdAt: string;
-  updatedAt: string;
-};
+import { Task } from "../types";
+import { getAllTasks, deleteTask ,completeTask } from "../services/task-service";
 
 const mockTasks: Task[] = [
   {
@@ -51,15 +40,16 @@ const mockTasks: Task[] = [
 
 export const ToDoPage: React.FC = () => {
   const { lang, t } = useLanguage();
-  const [taskList, setTaskList] = useState<Task[]>(() => {
-    const stored = localStorage.getItem("tasks");
-    return stored ? JSON.parse(stored) : mockTasks;
-  });
+  const [taskList, setTaskList] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState("");
 
+  const fetchAllTasks = async () => {
+     const response = await getAllTasks();
+     setTaskList(response.data);
+  }
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(taskList));
-  }, [taskList]);
+   fetchAllTasks()
+  }, []);
 
   const handleAddTask = () => {
     if (newTask.trim()) {
@@ -79,7 +69,7 @@ export const ToDoPage: React.FC = () => {
     }
   };
 
-  const handleToggle = (id: string) => {
+  const handleToggle = async (id: string) => {
     setTaskList((prev) =>
       prev.map((task) =>
         task._id === id
@@ -91,10 +81,12 @@ export const ToDoPage: React.FC = () => {
           : task
       )
     );
+    await completeTask(id);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete =async (id: string) => {
     setTaskList((prev) => prev.filter((task) => task._id !== id));
+    await deleteTask(id);
   };
 
   return (
@@ -169,8 +161,8 @@ export const ToDoPage: React.FC = () => {
                 <TableCell sx={headCellSx} align="center">
                   {t("status")}
                 </TableCell>
-                <TableCell sx={headCellSx} align="center"></TableCell>
-                <TableCell sx={headCellSx} align="center"></TableCell>
+                <TableCell sx={headCellSx} align="center">{t("priority")}</TableCell>
+                <TableCell sx={headCellSx} align="center">{t("actions")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -183,12 +175,13 @@ export const ToDoPage: React.FC = () => {
                     {t(task.isCompleted ? "done" : "notDone")}
                   </TableCell>
                   <TableCell sx={bodyCellSx} align="center">
+                    {t(task.priority?? "medium")}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx} align="center">
                     <Checkbox
                       checked={task.isCompleted}
                       onChange={() => handleToggle(task._id)}
                     />
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
                     <IconButton onClick={() => handleDelete(task._id)}>
                       <DeleteIcon />
                     </IconButton>
