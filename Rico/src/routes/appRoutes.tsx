@@ -11,6 +11,7 @@ import LoginPage from '../pages/LoginPage';
 import { useAuth } from '../context/auth-context';
 import LandingPage from '../pages/LandingPage';
 import GreetingPage from '../pages/GreetingPage';
+import BusinessRegistrationPage from '../pages/BusinessRegistration';
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
@@ -34,7 +35,8 @@ interface AppRoutesProps {
 const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />}/>
+      <Route path="/" element={<BusinessRegistrationPage />}/>
+      {/* <Route path="/" element={<LandingPage />}/> */}
       <Route path="/login" element={<LoginPage />}/>
       <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={
