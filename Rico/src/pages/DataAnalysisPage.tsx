@@ -37,7 +37,7 @@ export const DataAnalysisPage: React.FC = () => {
     >
       <Box component="main" sx={{ flex: 1, p: 4 }}>
         {/* Title */}
-        <Typography variant="h4" sx={{ mb: 3 , color: "#3f51b5" }}>
+        <Typography variant="h4" sx={{ mb: 3}}>
           {t("dataAnalysis")}
         </Typography>
         {/* Error display */}

@@ -28,7 +28,7 @@ const Sidebar: React.FC = () => {
   const [activeItem, setActiveItem] = useState(location.pathname);
 
   const menuItems = [
-    { id: '/dashboard', label: 'Dashboard', icon: <HomeIcon /> },
+    { id: '/dashboard', label: 'בית', icon: <HomeIcon /> },
     { id: '/reviews', label: 'תגובות', icon: <GridViewIcon /> },
     { id: '/data-analysis', label: 'ניתוח נתונים', icon: <BarChartIcon /> },
     { id: '/optimization', label: 'הצעות ייעול', icon: <AssignmentIcon /> },
@@ -36,11 +36,11 @@ const Sidebar: React.FC = () => {
 
   const pagesMenuItems = [
     { id: '/customers', label: 'לקוחות', icon: <PeopleIcon /> },
-    { id: '/todo', label: 'To-Do', icon: <CheckBoxIcon /> },
+    { id: '/todo', label: 'משימות', icon: <CheckBoxIcon /> },
   ];
 
   const bottomMenuItems = [
-    { id: '/logout', label: 'Logout', icon: <LogoutIcon /> },
+    { id: '/logout', label: 'התנתק', icon: <LogoutIcon /> },
   ];
 
   const handleItemClick = async (id: string) => {
