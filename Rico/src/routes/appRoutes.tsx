@@ -12,6 +12,7 @@ import { useAuth } from '../context/auth-context';
 import LandingPage from '../pages/LandingPage';
 import GreetingPage from '../pages/GreetingPage';
 import BusinessRegistrationPage from '../pages/BusinessRegistration';
+import CustomerProfilePage from '../pages/CustomerProfilePage';
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
@@ -37,6 +38,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
     <Routes>
       <Route path="/" element={<BusinessRegistrationPage />}/>
       {/* <Route path="/" element={<LandingPage />}/> */}
+      <Route path="/customerProfile" element={<CustomerProfilePage />}/>
       <Route path="/login" element={<LoginPage />}/>
       <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -9,18 +9,61 @@ import {
   useTheme,
 } from "@mui/material";
 import ricoLogo from "../assets/rico-logo.png"; // Update path if needed
+import { useLanguage } from "../context/language/LanguageContext";
+import LoginModal from "../components/loginModal";
+import { useAuth } from "../context/auth-context";
+import { useNavigate } from "react-router-dom";
 
 const BusinessRegistrationPage: React.FC = () => {
+  const [loginOpen, setLoginOpen] = useState(false);
+  const { user} = useAuth();
+  const { t } = useLanguage();
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+      if (user) {
+        if (user.role === 'admin') {
+          navigate('/dashboard');
+        } else {
+          setLoginOpen(false);
+          navigate('/customerProfile')
+        }
+      }
+    }, [user, loginOpen, navigate]);
 
   return (
     <Box
       sx={{
         fontFamily: "Arial, sans-serif",
         backgroundColor: theme.palette.background.default,
-        scrollBehavior: "smooth", // smooth scroll for this page
+        scrollBehavior: "smooth",
       }}
     >
+      {/* Login Button - top right */}
+        <Button
+          onClick={() => setLoginOpen(true)}
+          sx={{
+          position: 'fixed',
+          top: 16,
+          right: 16,
+          background: '#fff',
+          borderRadius: '1rem',
+          padding: '0.5rem 1rem',
+          fontSize: '1rem',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          color: 'black',
+          textTransform: 'none',
+          zIndex: 1000,
+          '&:hover': {
+            background: '#eee',
+          },
+        }}
+        >
+          {t("login")}
+        </Button>
+        {/* Login Modal */}
+              <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
       {/* Header */}
       <Box
         sx={{
