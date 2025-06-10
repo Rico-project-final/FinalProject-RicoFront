@@ -14,7 +14,9 @@ interface AuthContextType {
   isClient: boolean;
   isGuest: boolean; // Keeping this for convenience, but will calculate differently
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string , phone:string) => Promise<void>;
+  registerUser: (email: string, password: string, name: string , phone?:string) => Promise<void>;
+  registerBusiness: (email: string, password: string, name: string , companyName:string, phone?:string) => Promise<void>;
+
   logout: () => void;
   loginWithGoogle: (credential: string) => Promise<void>;
   clearError: () => void;
@@ -73,14 +75,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
   };
+  // Register function for business
+  const registerBusiness = async (email: string, password: string, name: string , companyName:string  , phone?:string) => {
+    setIsLoading(true);
+    setError(null); 
+    try {
+      const { request } = authService.registerBusiness({ email, password, companyName, name, phone });
+      const response = await request;
+
+      authService.saveAuth(response.data);
+      setUser(response.data.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Business registration failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+    
+  };
 
   // Register function
-  const register = async (name : string, email : string, password : string , phone : string ) => {
+  const registerUser = async (email : string, password : string, name : string , phone? : string) => {
   setIsLoading(true);
   setError(null);
 
   try {
-    const { request } = authService.register({ name, email, password , phone });
+    const { request } = authService.registerUser({ email, password , name, phone });
     const response = await request;
 
     authService.saveAuth(response.data);
@@ -149,7 +169,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isClient,
     isGuest,
     login,
-    register,
+    registerUser,
+    registerBusiness,
     logout,
     loginWithGoogle,
     clearError

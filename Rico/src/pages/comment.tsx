@@ -15,13 +15,34 @@ import {
 } from "@mui/material";
 import { getAllReviews, triggerAllReviewAnalyses } from "../services/review-service";
 import { Review } from "../types";
+import CommentModal from "../components/commentModal";
 
 export const CommentsPage: React.FC = () => {
+  const today = dayjs().format("YYYY-MM-DD");
   const { lang, t } = useLanguage();
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [filteredReviews, setFilteredReviews] = useState<Review[]>([]);
   const [nameFilter, setNameFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState(""); // date is empty by default
+  const [dateFilter, setDateFilter] = useState(today); 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState<string>("");
+
+  // Function to open modal on comment click
+  const handleCommentClick = (commentText: string) => {
+    setSelectedComment(commentText);
+    setModalOpen(true);
+  };
+  // Function to close modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedComment("");
+  };
+
+  // Function for the modal's handle button
+  const handleModalButtonClick = () => {
+    alert("Handle button clicked!");
+    handleCloseModal();
+  };
 
   // Load data
   useEffect(() => {
@@ -60,7 +81,7 @@ export const CommentsPage: React.FC = () => {
 
   const resetFilters = () => {
     setNameFilter("");
-    setDateFilter("");
+    setDateFilter(today);
     setFilteredReviews(allReviews);
   };
 
@@ -105,6 +126,8 @@ export const CommentsPage: React.FC = () => {
               onChange={(e) => setDateFilter(e.target.value)}
               sx={dateInputSx}
               placeholder="Select date"
+              inputProps={{ max: today }} // Prevent future dates 
+              
             />
           </Box>
 
@@ -159,7 +182,12 @@ export const CommentsPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {filteredReviews.map((review) => (
-                <TableRow key={review._id}>
+                <TableRow
+                  key={review._id}
+                  hover
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => handleCommentClick(review.text)}
+                >
                   <TableCell sx={tdSx} align="center">
                     {review.userId !== null && typeof review.userId === "object" && "name" in review.userId
                       ? review.userId.name
@@ -186,6 +214,13 @@ export const CommentsPage: React.FC = () => {
             </TableBody>
           </Table>
         </Paper>
+            <CommentModal
+          open={modalOpen}
+          comment={selectedComment}
+          onClose={handleCloseModal}
+          onHandleClick={handleModalButtonClick}
+          handleButtonText="Confirm"
+        />
       </Container>
     </Box>
   );

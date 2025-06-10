@@ -31,7 +31,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
   const {
     login,
-    register,
+    registerUser,
     loginWithGoogle,
     isLoading,
     error,
@@ -64,7 +64,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const handleRegister = async () => {
     clearError();
     try {
-      await register(name, email, password, phone);
+      await registerUser(email, password, name, phone);
 
       onClose();
       alert(`${t('welcome')}, ${name}!`);
