@@ -12,6 +12,8 @@ import CloseIcon from "@mui/icons-material/Close";
 interface CommentModalProps {
   open: boolean;
   comment: string;
+  clientName: string;
+  commentDate: string | Date;
   onClose: () => void;
   onHandleClick: () => void;
   handleButtonText?: string;
@@ -20,10 +22,18 @@ interface CommentModalProps {
 const CommentModal: React.FC<CommentModalProps> = ({
   open,
   comment,
+  clientName,
+  commentDate,
   onClose,
   onHandleClick,
   handleButtonText = "Handle",
 }) => {
+  const formattedDate = new Date(commentDate).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="comment-modal-title" aria-describedby="comment-modal-description">
       <Box
@@ -43,7 +53,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
       >
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Typography id="comment-modal-title" variant="h6" component="h2">
-            Comment
+            {clientName} - {formattedDate}
           </Typography>
           <IconButton aria-label="close" onClick={onClose}>
             <CloseIcon />

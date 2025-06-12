@@ -26,10 +26,15 @@ export const CommentsPage: React.FC = () => {
   const [dateFilter, setDateFilter] = useState(today); 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedComment, setSelectedComment] = useState<string>("");
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+  const [selectedCommentDate, setSelectedCommentDate] = useState<string>("");
+
 
   // Function to open modal on comment click
-  const handleCommentClick = (commentText: string) => {
+  const handleCommentClick = (commentText: string, clientName: string, createdAt: string) => {
     setSelectedComment(commentText);
+    setSelectedClientName(clientName);
+    setSelectedCommentDate(new Date(createdAt).toLocaleDateString());
     setModalOpen(true);
   };
   // Function to close modal
@@ -186,7 +191,15 @@ export const CommentsPage: React.FC = () => {
                   key={review._id}
                   hover
                   sx={{ cursor: "pointer" }}
-                  onClick={() => handleCommentClick(review.text)}
+                  onClick={() =>
+                      handleCommentClick(
+                        review.text,
+                        review.userId && typeof review.userId === "object" && "name" in review.userId
+                          ? review.userId.name
+                          : "-",
+                        review.createdAt
+                      )
+                    }
                 >
                   <TableCell sx={tdSx} align="center">
                     {review.userId !== null && typeof review.userId === "object" && "name" in review.userId
@@ -215,12 +228,14 @@ export const CommentsPage: React.FC = () => {
           </Table>
         </Paper>
             <CommentModal
-          open={modalOpen}
-          comment={selectedComment}
-          onClose={handleCloseModal}
-          onHandleClick={handleModalButtonClick}
-          handleButtonText="Confirm"
-        />
+                open={modalOpen}
+                comment={selectedComment}
+                clientName={selectedClientName}
+                commentDate={selectedCommentDate}
+                onClose={handleCloseModal}
+                onHandleClick={handleModalButtonClick}
+                handleButtonText="Confirm"
+              />
       </Container>
     </Box>
   );
