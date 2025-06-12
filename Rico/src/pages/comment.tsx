@@ -233,8 +233,6 @@ export const CommentsPage: React.FC = () => {
                 clientName={selectedClientName}
                 commentDate={selectedCommentDate}
                 onClose={handleCloseModal}
-                onHandleClick={handleModalButtonClick}
-                handleButtonText="Confirm"
               />
       </Container>
     </Box>

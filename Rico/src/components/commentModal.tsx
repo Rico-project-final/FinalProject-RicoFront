@@ -4,7 +4,6 @@ import {
   Modal,
   Typography,
   IconButton,
-  Button,
   Paper,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -15,8 +14,6 @@ interface CommentModalProps {
   clientName: string;
   commentDate: string | Date;
   onClose: () => void;
-  onHandleClick: () => void;
-  handleButtonText?: string;
 }
 
 const CommentModal: React.FC<CommentModalProps> = ({
@@ -25,8 +22,6 @@ const CommentModal: React.FC<CommentModalProps> = ({
   clientName,
   commentDate,
   onClose,
-  onHandleClick,
-  handleButtonText = "Handle",
 }) => {
   const formattedDate = new Date(commentDate).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -35,7 +30,12 @@ const CommentModal: React.FC<CommentModalProps> = ({
   });
 
   return (
-    <Modal open={open} onClose={onClose} aria-labelledby="comment-modal-title" aria-describedby="comment-modal-description">
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby="comment-modal-title"
+      aria-describedby="comment-modal-description"
+    >
       <Box
         component={Paper}
         sx={{
@@ -51,20 +51,23 @@ const CommentModal: React.FC<CommentModalProps> = ({
           outline: "none",
         }}
       >
+        {/* Header section: date left, name right */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          <Typography id="comment-modal-title" variant="h6" component="h2">
-            {clientName} - {formattedDate}
+          <Typography variant="body2" color="text.secondary">
+            {formattedDate}
           </Typography>
-          <IconButton aria-label="close" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="h6">{clientName}</Typography>
+            <IconButton aria-label="close" onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
-        <Typography id="comment-modal-description" sx={{ mb: 3 }}>
+
+        {/* Comment content */}
+        <Typography id="comment-modal-description">
           {comment}
         </Typography>
-        <Button variant="contained" fullWidth onClick={onHandleClick}>
-          {handleButtonText}
-        </Button>
       </Box>
     </Modal>
   );
