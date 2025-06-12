@@ -1,6 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import DonutChart from "./SentimentChart"; // adjust path if needed
 import { ReviewAnalysis } from "../types";
+import { log } from "console";
 
 interface DataCardProps {
   title: string;
@@ -8,8 +9,10 @@ interface DataCardProps {
 }
 
 const DataCard: React.FC<DataCardProps> = ({ title, reviews }) => {
+  reviews.forEach(r => console.log(r));
   return (
     <Paper
+    
       sx={{
         flex: 1,
         p: 3,

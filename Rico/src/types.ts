@@ -55,3 +55,11 @@ export interface ReviewAnalysis extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Business {
+  _id: string;
+  BusinessName: string;
+  phone: string;
+  reviews: string[];
+  ownerId?: string;
+}

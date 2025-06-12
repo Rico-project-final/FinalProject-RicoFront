@@ -1,75 +1,86 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Paper, Button, Divider } from "@mui/material";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  Box,
+  Typography,
+  Paper,
+  Button,
+  Divider
+} from "@mui/material";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from "recharts";
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
-import { getDashboardStats } from "../services/user-service";
+import { getDashboardStats, generateBusinessQr } from "../services/user-service";
 import { Review } from "../types";
 
 export const Dashboard: React.FC = () => {
- const [stats, setStats] = useState<Array<{
-  label: keyof TranslationKeys;
-  icon: string;
-  changeColor: string;
-  changeText: keyof TranslationKeys;
-  bg: string;
-}>>([
-  {
-    label: "totalClients",
-    icon: "👤",
-    changeColor: "green",
-    changeText: "upFromYesterday",
-    bg: "#f3f0ea",
-  },
-  {
-    label: "totalTasks",
-    icon: "📈",
-    changeColor: "red",
-    changeText: "downFromYesterday",
-    bg: "#eafaf3",
-  },
-  {
-    label: "totalReviews", 
-    icon: "💬",
-    changeColor: "green",
-    changeText: "upFromYesterday",
-    bg: "#faecea",
-  },
-]);
+  const [stats, setStats] = useState<Array<{
+    label: keyof TranslationKeys;
+    icon: string;
+    changeColor: string;
+    changeText: keyof TranslationKeys;
+    bg: string;
+  }>>([
+    {
+      label: "totalClients",
+      icon: "👤",
+      changeColor: "green",
+      changeText: "upFromYesterday",
+      bg: "#f3f0ea",
+    },
+    {
+      label: "totalTasks",
+      icon: "📈",
+      changeColor: "red",
+      changeText: "downFromYesterday",
+      bg: "#eafaf3",
+    },
+    {
+      label: "totalReviews",
+      icon: "💬",
+      changeColor: "green",
+      changeText: "upFromYesterday",
+      bg: "#faecea",
+    },
+  ]);
 
-const [totalStats, setTotalStats] = useState({ totalReviews: 0, totalClients: 0, totalTasks: 0 });
-const [reviews, setReviews] = useState<Review[]>([]);
-const [error, setError] = useState<string | null>(null);
-const [chartData, setChartData] = useState<any>();
-const { lang, t } = useLanguage();
+  const [totalStats, setTotalStats] = useState({ totalReviews: 0, totalClients: 0, totalTasks: 0 });
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [chartData, setChartData] = useState<any>();
+  const [qrImage, setQrImage] = useState<string | null>(null);
 
-  // const chartData = [
-  //   { name: "Jan", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 1 },
-  //   { name: "Feb", [t("food")]: 1, [t("service")]: 2, [t("experience")]: 2 },
-  //   { name: "Mar", [t("food")]: 2, [t("service")]: 2, [t("experience")]: 1 },
-  //   { name: "Apr", [t("food")]: 1, [t("service")]: 3, [t("experience")]: 2 },
-  //   { name: "Mai", [t("food")]: 3, [t("service")]: 2, [t("experience")]: 1 },
-  //   { name: "Jun", [t("food")]: 2, [t("service")]: 1, [t("experience")]: 3 },
-  // ];
+  const { lang, t } = useLanguage();
 
   const fetchDashboardData = async () => {
-  try {
-    const response = await getDashboardStats();
-    setTotalStats(response.data);
-    setReviews(response.data.lastWeekReviews);
-    setChartData(response.data.chartData);
-  } catch (e: any) {
-    setError("error while loading data");
-  }
-};
+    try {
+      const response = await getDashboardStats();
+      setTotalStats(response.data);
+      setReviews(response.data.lastWeekReviews);
+      setChartData(response.data.chartData);
+    } catch (e: any) {
+      setError("error while loading data");
+    }
+  };
+
+  const handleGenerateQR = async () => {
+    try {
+      const res = await generateBusinessQr();
+      setQrImage(res.data.image);
+    } catch (err) {
+      console.error("Error generating QR:", err);
+    }
+  };
 
   useEffect(() => {
-    try {
-
-      fetchDashboardData()
-    } catch (e: any) {
-      setError("שגיאה בטעינת הנתונים");
-    }
+    fetchDashboardData();
   }, []);
 
   if (error) return <Typography color="error">{error}</Typography>;
@@ -90,7 +101,7 @@ const { lang, t } = useLanguage();
 
         {/* Stats Cards */}
         <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-          {stats.map((stat,index) => (
+          {stats.map((stat, index) => (
             <Paper
               key={stat.label}
               sx={{
@@ -108,7 +119,9 @@ const { lang, t } = useLanguage();
               <Typography sx={{ fontSize: 14, color: "#888" }}>
                 {t(stat.label)}
               </Typography>
-              <Typography sx={{ fontSize: 28 }}> {totalStats[stat.label as keyof typeof totalStats]} {stat.icon}</Typography>
+              <Typography sx={{ fontSize: 28 }}>
+                {totalStats[stat.label as keyof typeof totalStats]} {stat.icon}
+              </Typography>
             </Paper>
           ))}
         </Box>
@@ -183,6 +196,52 @@ const { lang, t } = useLanguage();
             </ResponsiveContainer>
           </Paper>
         </Box>
+
+        {/* QR Code Section */}
+        <Paper
+          sx={{
+            mt: 4,
+            p: 3,
+            borderRadius: 2,
+            backgroundColor: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
+            {/* {t("generateQr")} */}
+            generate QR
+          </Typography>
+          <Button onClick={handleGenerateQR} variant="contained">
+            {/* {t("generateQr")} */}
+            generate QR
+          </Button>
+
+          {qrImage && (
+            <>
+              <img
+                src={qrImage}
+                alt="QR Code"
+                style={{ marginTop: 16, width: 200, height: 200 }}
+              />
+              <Button
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = qrImage;
+                  link.download = "business-qr.png";
+                  link.click();
+                }}
+                variant="outlined"
+              >
+                {/* {t("downloadQr")}
+                 */}
+                 donwload QR
+              </Button>
+            </>
+          )}
+        </Paper>
       </Box>
     </Box>
   );

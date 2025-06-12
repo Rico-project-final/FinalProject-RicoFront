@@ -96,7 +96,7 @@ export const ImprovementSuggestionsPage: React.FC = () => {
     >
       <Box sx={{ flex: 1 }}>
         <Typography variant="h4" sx={{ mb: 3 }}>
-          {t("title")}
+          
         </Typography>
 
         <TableContainer

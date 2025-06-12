@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import logo from '../assets/rico-logo.png';
 import LoginModal from '../components/loginModal';
 import { Box, Typography, Button, TextField } from '@mui/material';
@@ -7,15 +7,32 @@ import { useLanguage } from '../context/language/LanguageContext';
 import { useAuth } from '../context/auth-context';
 import { createReview } from '../services/review-service';
 import { useEffect } from 'react';
-
+import { getBusinessById } from '../services/business-service';
+import { Business } from '../types';
 
 const LandingPage: React.FC = () => {
+  const { businessId } = useParams();
   const [loginOpen, setLoginOpen] = useState(false);
   const [reviewText, setReviewText] = useState('');
   const { t } = useLanguage();
   const { user, isAuthenticated ,logout  } = useAuth();
   const navigate = useNavigate();
+  const [businessName, setBusinessName] = useState<string | null>(null);
 
+      useEffect(() => {
+      const fetchBusiness = async () => {
+        if (!businessId) return; // ✅ Prevent calling with undefined
+
+        try {
+          const res = await getBusinessById(businessId); // ✅ Now TypeScript is happy
+          setBusinessName(res.data.BusinessName);
+        } catch (err) {
+          console.error("Failed to fetch business info:", err);
+        }
+      };
+
+    fetchBusiness();
+    }, [businessId]); // ✅ only re-run when businessId changes
     useEffect(() => {
       if (user) {
         if (user.role === 'admin') {
@@ -28,7 +45,12 @@ const LandingPage: React.FC = () => {
 
   const handleSubmitFeedback = async () => {
     try {
-      await createReview({ text: reviewText });
+      if(businessId) {
+      await createReview({ text: reviewText , businessId: businessId });
+      }else {
+        alert('Business ID is not provided');
+        return;
+      }
       navigate('/GreetingPage');
     } catch (err) {
       console.error('Failed to submit review:', err);
@@ -113,9 +135,14 @@ const LandingPage: React.FC = () => {
         {isAuthenticated && user?.name && (
           <Typography variant="h6" sx={{ mt: 2 }}>
             {t('welcome')}, {user.name}!
-          </Typography>
-        )}
-
+                      </Typography>
+                    )}
+                    {businessName && (
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                {/* {t('youAreReviewing')} {businessName} */}
+                 {businessName}
+              </Typography>
+            )}
         <Typography variant="h4" sx={{ fontSize: '1.8rem', mb: 1 }}>
           ברוך הבא!
         </Typography>

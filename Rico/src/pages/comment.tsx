@@ -13,16 +13,41 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { getAllReviews , triggerAllReviewAnalyses} from "../services/review-service";
+import { getAllReviews, triggerAllReviewAnalyses } from "../services/review-service";
 import { Review } from "../types";
+import CommentModal from "../components/commentModal";
 
 export const CommentsPage: React.FC = () => {
   const today = dayjs().format("YYYY-MM-DD");
-  const [dateFilter, setDateFilter] = useState(today);
   const { lang, t } = useLanguage();
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [filteredReviews, setFilteredReviews] = useState<Review[]>([]);
   const [nameFilter, setNameFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState(today); 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState<string>("");
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+  const [selectedCommentDate, setSelectedCommentDate] = useState<string>("");
+
+
+  // Function to open modal on comment click
+  const handleCommentClick = (commentText: string, clientName: string, createdAt: string) => {
+    setSelectedComment(commentText);
+    setSelectedClientName(clientName);
+    setSelectedCommentDate(new Date(createdAt).toLocaleDateString());
+    setModalOpen(true);
+  };
+  // Function to close modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedComment("");
+  };
+
+  // Function for the modal's handle button
+  const handleModalButtonClick = () => {
+    alert("Handle button clicked!");
+    handleCloseModal();
+  };
 
   // Load data
   useEffect(() => {
@@ -35,7 +60,6 @@ export const CommentsPage: React.FC = () => {
         console.error("Failed to fetch reviews:", error);
       }
     };
-
     fetchReviews();
   }, []);
 
@@ -45,7 +69,7 @@ export const CommentsPage: React.FC = () => {
 
     if (nameFilter.trim()) {
       filtered = filtered.filter((review) =>
-        review.userId !== null && (typeof review.userId === "object" && "name" in review.userId)
+        review.userId !== null && typeof review.userId === "object" && "name" in review.userId
           ? review.userId.name.toLowerCase().includes(nameFilter.trim().toLowerCase())
           : false
       );
@@ -60,17 +84,15 @@ export const CommentsPage: React.FC = () => {
     setFilteredReviews(filtered);
   };
 
-
   const resetFilters = () => {
     setNameFilter("");
-    setDateFilter("");
+    setDateFilter(today);
     setFilteredReviews(allReviews);
   };
 
   const handleAllReviewAnalysis = async () => {
-        await triggerAllReviewAnalyses();
-   };
-
+    await triggerAllReviewAnalyses();
+  };
 
   return (
     <Box
@@ -83,20 +105,37 @@ export const CommentsPage: React.FC = () => {
     >
       <Container maxWidth="xl" sx={{ flex: 1, py: 4 }}>
         {/* Filters */}
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            alignItems: "center",
+            mb: 2,
+            flexWrap: "nowrap",
+            overflowX: "auto",
+            minHeight: "56px",
+          }}
+        >
           <InputBase
             placeholder={t("clientName")}
             value={nameFilter}
             onChange={(e) => setNameFilter(e.target.value)}
             sx={dateInputSx}
           />
-          <InputBase
+
+          {/* Date input */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <InputBase
               type="date"
-              value={dateFilter}
+              value={dateFilter || ""}
               onChange={(e) => setDateFilter(e.target.value)}
-              inputProps={{ max: today }}
               sx={dateInputSx}
+              placeholder="Select date"
+              inputProps={{ max: today }} // Prevent future dates 
+              
             />
+          </Box>
+
           <Button variant="outlined" onClick={applyFilters} sx={filterBtnSx}>
             {t("filter")}
           </Button>
@@ -113,38 +152,90 @@ export const CommentsPage: React.FC = () => {
           >
             {t("resetFilter")}
           </Button>
-          <Button variant="outlined" onClick={handleAllReviewAnalysis} sx={{ ...filterBtnSx, color: 'green' }}>
+          <Button
+            variant="outlined"
+            onClick={handleAllReviewAnalysis}
+            sx={{ ...filterBtnSx, color: "green" }}
+          >
             {t("Analyze")}
           </Button>
         </Box>
 
         {/* Table */}
-        <Paper elevation={3} sx={{ borderRadius: 2, overflow: "hidden", bgcolor: "#f8f6f2" }}>
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: 2,
+            overflow: "auto",
+            bgcolor: "#f8f6f2",
+            minHeight: "400px",
+          }}
+        >
           <Table sx={{ minWidth: 650 }} aria-label="comments table">
             <TableHead>
               <TableRow sx={{ bgcolor: "#ede6d6", textAlign: "center" }}>
-                <TableCell sx={thSx} align="center">{t("clientName")}</TableCell>
-                <TableCell sx={thSx} align="center">{t("date")}</TableCell>
-                <TableCell sx={thSx} align="center">{t("reviewDesc")}</TableCell>
+                <TableCell sx={thSx} align="center">
+                  {t("clientName")}
+                </TableCell>
+                <TableCell sx={thSx} align="center">
+                  {t("date")}
+                </TableCell>
+                <TableCell sx={thSx} align="center">
+                  {t("reviewDesc")}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredReviews.map((review) => (
-                <TableRow key={review._id}>
+                <TableRow
+                  key={review._id}
+                  hover
+                  sx={{ cursor: "pointer" }}
+                  onClick={() =>
+                      handleCommentClick(
+                        review.text,
+                        review.userId && typeof review.userId === "object" && "name" in review.userId
+                          ? review.userId.name
+                          : "-",
+                        review.createdAt
+                      )
+                    }
+                >
                   <TableCell sx={tdSx} align="center">
-                    { review.userId !== null && typeof review.userId === "object" && "name" in review.userId
+                    {review.userId !== null && typeof review.userId === "object" && "name" in review.userId
                       ? review.userId.name
                       : "-"}
                   </TableCell>
                   <TableCell sx={tdSx} align="center">
                     {new Date(review.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell sx={tdSx} align="center">{review.text}</TableCell>
+                  <TableCell sx={{ ...tdSx, maxWidth: 300 }} align="center">
+                    <Box
+                      sx={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "300px",
+                      }}
+                      title={review.text}
+                    >
+                      {review.text}
+                    </Box>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </Paper>
+            <CommentModal
+                open={modalOpen}
+                comment={selectedComment}
+                clientName={selectedClientName}
+                commentDate={selectedCommentDate}
+                onClose={handleCloseModal}
+                onHandleClick={handleModalButtonClick}
+                handleButtonText="Confirm"
+              />
       </Container>
     </Box>
   );
@@ -180,3 +271,5 @@ const thSx = {
 const tdSx = {
   py: 1.5,
 };
+
+export default CommentsPage;

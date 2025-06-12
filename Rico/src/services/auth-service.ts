@@ -42,13 +42,31 @@ const authService = {
   },
 
   // Register a new user
-  register(data: { email: string; password: string; name?: string , phone?:string }): ApiRequest {
-  return this.createCancellableRequest('/auth/register', 'POST', data);
+  registerUser(data: { email: string; password: string; name: string , phone?:string}): ApiRequest {
+  return this.createCancellableRequest('/auth/registerCustomer', 'POST', data);
+},
+
+// Register a new business
+registerBusiness(data: { email: string; password: string; name: string; companyName: string , phone?:string}): ApiRequest {
+  return this.createCancellableRequest('/auth/registerBusiness', 'POST', data);
 },
 
   // Login with Google token
   loginWithGoogleToken(credential: string): ApiRequest {
-    return this.createCancellableRequest('/auth/googleAuth', 'POST', { credential });
+    return this.createCancellableRequest('/auth/customerGoogleAuth', 'POST', { credential });
+  },
+    businessGoogleSignUp(
+    credential: string,
+    businessName: string,
+    phone: string,
+    password: string
+  ): ApiRequest {
+    return this.createCancellableRequest('/auth/businessGoogleAuth', 'POST', {
+      credential,
+      businessName,
+      phone,
+      password,
+    });
   },
 
   // Logout

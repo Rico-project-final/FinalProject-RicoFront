@@ -37,6 +37,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
   return (
     <Routes>
       <Route path="/" element={<BusinessRegistrationPage />}/>
+      <Route path="/review/:businessId" element={<LandingPage />} />
       {/* <Route path="/" element={<LandingPage />}/> */}
       <Route path="/customerProfile" element={<CustomerProfilePage />}/>
       <Route path="/login" element={<LoginPage />}/>
