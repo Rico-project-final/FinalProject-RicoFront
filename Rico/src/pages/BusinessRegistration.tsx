@@ -12,28 +12,31 @@ import { useLanguage } from "../context/language/LanguageContext";
 import LoginModal from "../components/loginModal";
 import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
+import authService from '../services/auth-service';
+
 
 const BusinessRegistrationPage: React.FC = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const theme = useTheme();
   const navigate = useNavigate();
-
   const {
     user,
     registerBusiness,
     isLoading,
+    registerBusinessWithGoogle,
     error,
     clearError,
   } = useAuth();
   const { t } = useLanguage();
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    companyName: "",
-  });
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  companyName: "",
+});
 
   const [formErrors, setFormErrors] = useState({
     name: "",
@@ -90,6 +93,30 @@ const BusinessRegistrationPage: React.FC = () => {
     } else {
       alert(errorMessage || 'Registration failed');
     }
+  }
+};
+const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
+  try {
+    clearError();
+    const credential = credentialResponse.credential;
+
+    if (!form.companyName || !form.phone || !form.password) {
+      alert("Please fill in company name, phone, and password before using Google Sign-Up.");
+      return;
+    }
+
+    await registerBusinessWithGoogle(
+      credential,
+      form.password,
+      form.companyName,
+      form.phone
+    );
+
+    alert(`${t("welcome")}, ${form.name || "business owner"}!`);
+    navigate('/dashboard');
+  } catch (err) {
+    console.error("Google Sign-up failed:", err);
+    alert("Google Sign-up failed");
   }
 };
 
@@ -223,7 +250,9 @@ const BusinessRegistrationPage: React.FC = () => {
               error={!!formErrors.companyName}
               helperText={formErrors.companyName}
             />
-            <Button
+            
+            <Box sx={{ mt: 3, alignSelf: "center" , display:"flex",alignItems:"center", justifyContent: "center",  gap: 2 }}>
+              <Button
               onClick={handleSubmit}
               variant="contained"
               color="secondary"
@@ -232,6 +261,14 @@ const BusinessRegistrationPage: React.FC = () => {
             >
               Register Now
             </Button>
+
+            <GoogleLogin
+              onSuccess={handleGoogleSignUpSuccess}
+              onError={() => alert("Google Sign-Up failed")}
+              useOneTap={false}
+            />
+          </Box>
+
           </Box>
         </Container>
       </Box>

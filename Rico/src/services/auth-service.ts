@@ -55,6 +55,19 @@ registerBusiness(data: { email: string; password: string; name: string; companyN
   loginWithGoogleToken(credential: string): ApiRequest {
     return this.createCancellableRequest('/auth/customerGoogleAuth', 'POST', { credential });
   },
+    businessGoogleSignUp(
+    credential: string,
+    businessName: string,
+    phone: string,
+    password: string
+  ): ApiRequest {
+    return this.createCancellableRequest('/auth/businessGoogleAuth', 'POST', {
+      credential,
+      businessName,
+      phone,
+      password,
+    });
+  },
 
   // Logout
   logout(): ApiRequest {

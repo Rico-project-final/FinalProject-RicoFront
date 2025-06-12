@@ -16,7 +16,12 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   registerUser: (email: string, password: string, name: string , phone?:string) => Promise<void>;
   registerBusiness: (email: string, password: string, name: string , companyName:string, phone?:string) => Promise<void>;
-
+registerBusinessWithGoogle: (
+  credential: string,
+  password: string,
+  companyName: string,
+  phone?: string
+) => Promise<void>;
   logout: () => void;
   loginWithGoogle: (credential: string) => Promise<void>;
   clearError: () => void;
@@ -149,6 +154,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const registerBusinessWithGoogle = async (
+  credential: string,
+  password: string,
+  companyName: string,
+  phone?: string
+): Promise<void> => {
+  setIsLoading(true);
+  setError(null);
+
+  try {
+    const { request } = authService.businessGoogleSignUp(
+      credential,
+      companyName,
+      phone?? '',
+      password
+    );
+    const response = await request;
+
+    authService.saveAuth(response.data);
+    setUser(response.data.user);
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Google business registration failed');
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   // Clear error function
   const clearError = () => {
     setError(null);
@@ -171,6 +204,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     registerUser,
     registerBusiness,
+    registerBusinessWithGoogle,
     logout,
     loginWithGoogle,
     clearError
