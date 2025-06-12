@@ -85,6 +85,7 @@ const CustomerProfilePage: React.FC = () => {
         Your Reviews
       </Typography>
       <List component={Paper} sx={{ p: 2 }}>
+        {/* TODO :: Add pagination - only display 15 each time */}
         {reviews.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No reviews submitted yet.

@@ -63,6 +63,7 @@ export const DataAnalysisPage: React.FC = () => {
         </Box>
 
         {/* Comments Section */}
+        {/* TODO :: Add pagination - only display 5 each time for each section */}
         <Box sx={{ display: "flex", gap: 3 }}>
           {/* Positive */}
            <CommentsColumn

@@ -117,6 +117,7 @@ export const ImprovementSuggestionsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* TODO :: Add pagination - only display 15 each time */}
               {reviewAnalaysis
                 .filter((review) => review.isResolved === false)
                 .map((s, i) => (

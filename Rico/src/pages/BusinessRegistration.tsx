@@ -57,7 +57,7 @@ const BusinessRegistrationPage: React.FC = () => {
     if (!form.password.trim()) errors.password = "Password is required";
     else if (form.password.length < 6) errors.password = "Password must be at least 6 characters";
     if (!form.phone.trim()) errors.phone = "Phone is required";
-    else if (!phoneRegex.test(form.phone)) errors.phone = "Phone must be numeric and 7-15 digits";
+    else if (!phoneRegex.test(form.phone)) errors.phone = "Phone must be numeric and 10 digits";
     if (!form.companyName.trim()) errors.companyName = "Company name is required";
 
     setFormErrors(errors);
@@ -82,7 +82,6 @@ const BusinessRegistrationPage: React.FC = () => {
       form.name,
       form.phone
     );
-    alert(`${t("welcome")}, ${form.name}!`);
   } catch (err: any) {
     console.error("Register failed:", err);
 
@@ -100,10 +99,7 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
     clearError();
     const credential = credentialResponse.credential;
 
-    if (!form.companyName || !form.phone || !form.password) {
-      alert("Please fill in company name, phone, and password before using Google Sign-Up.");
-      return;
-    }
+    if (!validateForm()) return;
 
     await registerBusinessWithGoogle(
       credential,
@@ -112,7 +108,6 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
       form.phone
     );
 
-    alert(`${t("welcome")}, ${form.name || "business owner"}!`);
     navigate('/dashboard');
   } catch (err) {
     console.error("Google Sign-up failed:", err);

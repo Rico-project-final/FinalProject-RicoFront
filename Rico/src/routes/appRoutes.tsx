@@ -7,7 +7,7 @@ import { ImprovementSuggestionsPage } from '../pages/ImprovementSuggestionsPage'
 import { ClientsPage } from '../pages/ClientsPage';
 import { ToDoPage } from '../pages/ToDoPage';
 import  AdminLayout  from '../layouts/AdminLayout'; // ✅ make sure this path is correct
-import LoginPage from '../pages/LoginPage';
+import LoginPage from '../pages/AccessDeniedPage';
 import { useAuth } from '../context/auth-context';
 import LandingPage from '../pages/LandingPage';
 import GreetingPage from '../pages/GreetingPage';
@@ -18,14 +18,14 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading ,isAdmin  } = useAuth();
+  const { isLoading ,isAdmin  } = useAuth();
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   if (!isAdmin) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/deniedAccess" />;
   }
   return <>{children}</>;
 };
@@ -38,9 +38,8 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
     <Routes>
       <Route path="/" element={<BusinessRegistrationPage />}/>
       <Route path="/review/:businessId" element={<LandingPage />} />
-      {/* <Route path="/" element={<LandingPage />}/> */}
       <Route path="/customerProfile" element={<CustomerProfilePage />}/>
-      <Route path="/login" element={<LoginPage />}/>
+      <Route path="/deniedAccess" element={<LoginPage />}/>
       <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={
         <PrivateRoute>

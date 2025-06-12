@@ -27,7 +27,7 @@ export type ReviewCategory = 'food' | 'service' | 'overall';
 
 export interface Review {
   _id: string;
-   userId?: string | null | {
+   userId?: string | {
     _id: string;
     name: string;
     email: string;

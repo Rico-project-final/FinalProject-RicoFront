@@ -81,18 +81,17 @@ useEffect(()=>{
                 <TableCell sx={headCellSx} align="center">{t("id")}</TableCell>
                 <TableCell sx={headCellSx} align="center">{t("email")}</TableCell>
                 <TableCell sx={headCellSx} align="center">{t("name")}</TableCell>
-                <TableCell sx={headCellSx} align="center">{t("phone")}</TableCell>
                 <TableCell sx={headCellSx} align="center">{t("contact")}</TableCell>
                 <TableCell sx={headCellSx} align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* TODO :: Add pagination - only display 15 each time */}
               {filteredClients.map((c) => (
                 <TableRow key={c._id} sx={{ textAlign: "center" }}>
                   <TableCell sx={bodyCellSx} align="center">{c._id.slice(-6)}</TableCell>
                   <TableCell sx={bodyCellSx} align="center">{c.email}</TableCell>
                   <TableCell sx={bodyCellSx} align="center">{c.name}</TableCell>
-                  <TableCell sx={bodyCellSx} align="center">{c.phone? c.phone : "-"}</TableCell>
                   <TableCell sx={[bodyCellSx, { position: "relative" }]} align="center">
                     <IconButton
                       onClick={handleContact}

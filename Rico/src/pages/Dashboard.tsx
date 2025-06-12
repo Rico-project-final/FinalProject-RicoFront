@@ -19,6 +19,7 @@ import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats, generateBusinessQr } from "../services/user-service";
 import { Review } from "../types";
+import CommentModal from "../components/commentModal";
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Array<{
@@ -56,7 +57,10 @@ export const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any>();
   const [qrImage, setQrImage] = useState<string | null>(null);
-
+  const [selectedComment, setSelectedComment] = useState<string | null>(null);
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<Date | string>(new Date());
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const { lang, t } = useLanguage();
 
   const fetchDashboardData = async () => {
@@ -77,6 +81,13 @@ export const Dashboard: React.FC = () => {
     } catch (err) {
       console.error("Error generating QR:", err);
     }
+  };
+
+  const handleOpenModal = (comment: string, clientName: string, date: string | Date) => {
+  setSelectedComment(comment);
+  setSelectedClientName(clientName);
+  setSelectedDate(date);
+  setIsCommentModalOpen(true);
   };
 
   useEffect(() => {
@@ -142,20 +153,28 @@ export const Dashboard: React.FC = () => {
             >
               {t("reviewsAddedThisWeek")}
             </Typography>
-
+            {/* TODO :: Add pagination - only 5 comments */}
             {reviews.map((c, i) => (
-              <Box key={i}>
-                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                  <Button variant="outlined" sx={commentButtonSx}>
-                    {t("viewReview")}
-                  </Button>
-                  <Button variant="outlined" sx={commentButtonSx}>
-                    {t("suggestTreatment")}
-                  </Button>
-                </Box>
-                {i < reviews.length - 1 && <Divider sx={{ mb: 2 }} />}
+            <Box key={i} sx={{ mb: 2 }}>
+              <Typography
+                sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
+                onClick={() =>
+                handleOpenModal(c.text, (c.userId as { name: string }).name, c.createdAt)}>
+                {c.text}
+              </Typography>
+
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button variant="outlined" sx={commentButtonSx}>
+                  {t("viewReview")}
+                </Button>
+                <Button variant="outlined" sx={commentButtonSx}>
+                  {t("suggestTreatment")}
+                </Button>
               </Box>
-            ))}
+
+              {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
+            </Box>
+          ))}
           </Paper>
 
           {/* Chart */}
@@ -243,6 +262,13 @@ export const Dashboard: React.FC = () => {
           )}
         </Paper>
       </Box>
+      <CommentModal
+        open={isCommentModalOpen}
+        comment={selectedComment || ""}
+        clientName={selectedClientName}
+        commentDate={selectedDate}
+        onClose={() => setIsCommentModalOpen(false)}
+      />
     </Box>
   );
 };

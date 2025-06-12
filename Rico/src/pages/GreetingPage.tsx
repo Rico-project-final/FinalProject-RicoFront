@@ -1,12 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
-// import RatingPage from '../components/RatingPage'; // Uncomment if you use a layout wrapper
 
 const GreetingPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLeaveAnother = () => {
-    navigate('/');
+    navigate('/customerProfile');
   };
 
   return (
@@ -55,7 +54,7 @@ const GreetingPage: React.FC = () => {
           },
         }}
       >
-        השאר ביקורת נוספת
+        לעמוד האישי לחץ כאן
       </Button>
     </Box>
     // </RatingPage>

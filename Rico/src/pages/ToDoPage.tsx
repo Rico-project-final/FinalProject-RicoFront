@@ -106,43 +106,6 @@ export const ToDoPage: React.FC = () => {
           {t("todo")}
         </Typography>
 
-        {/* Add Task */}
-        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-          <TextField
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-            placeholder={t("task")}
-            variant="outlined"
-            size="small"
-            sx={{
-              bgcolor: "#f8f6f2",
-              borderRadius: "20px",
-              width: 260,
-            }}
-            InputProps={{
-              sx: {
-                px: 2,
-                py: 1,
-                borderRadius: "20px",
-              },
-            }}
-          />
-          <Button
-            onClick={handleAddTask}
-            variant="outlined"
-            sx={{
-              borderRadius: "20px",
-              bgcolor: "#f3f0ea",
-              border: "1px solid #cfc6b0",
-              fontWeight: "bold",
-              px: 4,
-            }}
-          >
-            {t("addTask")}
-          </Button>
-        </Box>
-
         {/* Task Table */}
         <TableContainer
           component={Paper}
@@ -166,6 +129,7 @@ export const ToDoPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* TODO :: Add pagination - only display 15 each time */}
               {taskList.map((task) => (
                 <TableRow key={task._id}>
                   <TableCell sx={bodyCellSx} align="center">

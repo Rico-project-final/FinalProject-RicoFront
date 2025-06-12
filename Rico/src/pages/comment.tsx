@@ -186,6 +186,7 @@ export const CommentsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* TODO :: Add pagination - only display 15 each time */}
               {filteredReviews.map((review) => (
                 <TableRow
                   key={review._id}
