@@ -1,11 +1,11 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { useLanguage } from "../context/language/LanguageContext";
 
-
 const CommentsColumn: React.FC<{
   comments: string[];
   type: "positive" | "negative";
-}> = ({ comments, type }) => {
+  onCommentClick?: (comment: string) => void;
+}> = ({ comments, type, onCommentClick }) => {
   const { t } = useLanguage();
 
   return (
@@ -42,6 +42,7 @@ const CommentsColumn: React.FC<{
               px: 3,
               py: 1,
             }}
+            onClick={() => onCommentClick?.(comment)}
           >
             {t("suggestTreatment")}
           </Button>
@@ -50,4 +51,5 @@ const CommentsColumn: React.FC<{
     </Box>
   );
 };
+
 export default CommentsColumn;

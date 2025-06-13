@@ -1,5 +1,5 @@
 import apiClient, { CanceledError } from './axios';
-import { Review } from '../types';
+import { Review , ReviewForUser} from '../types';
 
 export { CanceledError };
 
@@ -29,7 +29,12 @@ export const getReviewById = (reviewId: string) => {
 export const deleteReview = (reviewId: string) => {
   return apiClient.delete<{ message: string }>(`/reviews/delete/${reviewId}`);
 };
+// POST /reviews/triggerAll (admin only)
 
 export const triggerAllReviewAnalyses = () => {
   return apiClient.post("/reviews/triggerAll")
+};
+// GET /reviews/getByUser (user only)
+export const getReviewsByUser = () => {
+  return apiClient.get<ReviewForUser[]>('/reviews/getByUser');
 };
