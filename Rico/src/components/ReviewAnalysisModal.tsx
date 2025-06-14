@@ -8,33 +8,61 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { ReviewAnalysis , SendEmailPayload} from "../types";
+import { sendAdminResponseEmail } from "../services/reviewAnalaysis-service";
 
 interface ReviewAnalysisModalProps {
   open: boolean;
   onClose: () => void;
-  initialText?: string;
+  reviewAnalysis: ReviewAnalysis | null;
 }
 
 const ReviewAnalysisModal: React.FC<ReviewAnalysisModalProps> = ({
   open,
   onClose,
-  initialText = "",
+  reviewAnalysis,
 }) => {
-  const [text, setText] = useState(initialText);
+  const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(initialText);
-  }, [initialText]);
+    setText(reviewAnalysis?.adminResponse ?? "");
+  }, [reviewAnalysis]);
 
-  const handleSendEmail = () => {
-    console.log("Sending admin response email:", text);
+  // TODO :: 
+const handleSendEmail = async () => {
+  try {
+    if (!reviewAnalysis) {
+      alert("No review selected.");
+      return;
+    }
 
-    // Example: Here you would actually call your email API or service
-    // await sendEmailToAdmin({ message: text });
+    let customerEmail = "";
 
-    alert("Email sent!"); // Feedback to user
-    onClose(); // Optional: close modal after sending
-  };
+    if (
+      reviewAnalysis.userId &&
+      typeof reviewAnalysis.userId === "object" &&
+      "email" in reviewAnalysis.userId
+    ) {
+      customerEmail = reviewAnalysis.userId.email;
+    }
+    console.log("reviewId:", reviewAnalysis.reviewId);
+    console.log("adminResponse:", text);
+    console.log("Customer Email:", customerEmail);
+   /* const payload = {
+      reviewId: reviewAnalysis.reviewId,
+      adminResponse: text,
+      customerEmail, 
+    } as SendEmailPayload;
+
+    await sendAdminResponseEmail(payload); */
+
+    alert("Email sent successfully!");
+    onClose();
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    alert("Failed to send email. Please try again later.");
+  }
+};
 
   return (
     <Modal open={open} onClose={onClose}>
