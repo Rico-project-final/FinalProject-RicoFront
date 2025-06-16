@@ -19,7 +19,7 @@ import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats, generateBusinessQr } from "../services/user-service";
 import { Review } from "../types";
-import CommentModal from "../components/commentModal";
+import CommentModal from "../components/commentModal"; // 👈 Import your modal component
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Array<{
@@ -57,10 +57,12 @@ export const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any>();
   const [qrImage, setQrImage] = useState<string | null>(null);
-  const [selectedComment, setSelectedComment] = useState<string | null>(null);
+
+  const [selectedComment, setSelectedComment] = useState<string>("");
   const [selectedClientName, setSelectedClientName] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date | string>(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | Date>(new Date());
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+
   const { lang, t } = useLanguage();
 
   const fetchDashboardData = async () => {
@@ -84,10 +86,10 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleOpenModal = (comment: string, clientName: string, date: string | Date) => {
-  setSelectedComment(comment);
-  setSelectedClientName(clientName);
-  setSelectedDate(date);
-  setIsCommentModalOpen(true);
+    setSelectedComment(comment);
+    setSelectedClientName(clientName);
+    setSelectedDate(date);
+    setIsCommentModalOpen(true);
   };
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-          {stats.map((stat, index) => (
+          {stats.map((stat) => (
             <Paper
               key={stat.label}
               sx={{
@@ -155,26 +157,22 @@ export const Dashboard: React.FC = () => {
             </Typography>
             {/* TODO :: Add pagination - only 5 comments */}
             {reviews.map((c, i) => (
-            <Box key={i} sx={{ mb: 2 }}>
-              <Typography
-                sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
-                onClick={() =>
-                handleOpenModal(c.text, (c.userId as { name: string }).name, c.createdAt)}>
-                {c.text}
-              </Typography>
-
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <Button variant="outlined" sx={commentButtonSx}>
-                  {t("viewReview")}
-                </Button>
-                <Button variant="outlined" sx={commentButtonSx}>
-                  {t("suggestTreatment")}
-                </Button>
+              <Box key={i} sx={{ mb: 2 }}>
+                <Typography
+                  sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
+                  onClick={() =>
+                    handleOpenModal(
+                      c.text,
+                      (c.userId as { name: string }).name,
+                      c.createdAt
+                    )
+                  }
+                >
+                  {c.text}
+                </Typography>
+                {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
               </Box>
-
-              {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
-            </Box>
-          ))}
+            ))}
           </Paper>
 
           {/* Chart */}
@@ -230,11 +228,9 @@ export const Dashboard: React.FC = () => {
           }}
         >
           <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
-            {/* {t("generateQr")} */}
             generate QR
           </Typography>
           <Button onClick={handleGenerateQR} variant="contained">
-            {/* {t("generateQr")} */}
             generate QR
           </Button>
 
@@ -254,32 +250,21 @@ export const Dashboard: React.FC = () => {
                 }}
                 variant="outlined"
               >
-                {/* {t("downloadQr")}
-                 */}
-                 donwload QR
+                download QR
               </Button>
             </>
           )}
         </Paper>
       </Box>
+
+      {/* Comment Modal */}
       <CommentModal
         open={isCommentModalOpen}
-        comment={selectedComment || ""}
+        comment={selectedComment}
         clientName={selectedClientName}
         commentDate={selectedDate}
         onClose={() => setIsCommentModalOpen(false)}
       />
     </Box>
   );
-};
-
-const commentButtonSx = {
-  border: "1px solid #cfc6b0",
-  backgroundColor: "#f3f0ea",
-  borderRadius: "20px",
-  px: 3,
-  py: 0.75,
-  textTransform: "none",
-  fontWeight: "bold",
-  fontSize: 14,
 };

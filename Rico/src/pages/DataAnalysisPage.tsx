@@ -12,19 +12,26 @@ export const DataAnalysisPage: React.FC = () => {
 
   const { lang, t } = useLanguage();
 
-  const fetchReviewsAnalysis = async () => {
+  useEffect(() => {
+  const fetchReviews = async () => {
     try {
       const response = await getAllReviewAnalyses();
-      setReviewsAnalasys(response.data);
+      console.log("API raw response:", response); 
+      setReviewsAnalasys(response.data); 
     } catch (error) {
       console.error("Failed to fetch review analyses:", error);
       setError("Failed to fetch review analyses");
     }
   };
 
+  fetchReviews();
+}, []);
+
   useEffect(() => {
-    fetchReviewsAnalysis();
-  }, []);
+  if (reviewsAnalasys) {
+    console.log("Fetched review analyses (updated state):", reviewsAnalasys);
+  }
+}, [reviewsAnalasys]);
 
   return (
     <Box
@@ -51,16 +58,16 @@ export const DataAnalysisPage: React.FC = () => {
         {/* Chart Data Cards */}
         <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
           <DataCard
-            title={t("experience")}
-            reviews={(reviewsAnalasys ?? []).filter((r) => r.category === "overall")}
+            title="experience"
+            initialReviews={(reviewsAnalasys ?? []).filter((r) => r.category === "overall experience")}
           />
           <DataCard
-            title={t("service")}
-            reviews={(reviewsAnalasys ?? []).filter((r) => r.category === "service")}
+            title="service"
+            initialReviews={(reviewsAnalasys ?? []).filter((r) => r.category === "service")}
           />
           <DataCard
-            title={t("food")}
-            reviews={(reviewsAnalasys ?? []).filter((r) => r.category === "food")}
+            title="food"
+            initialReviews={(reviewsAnalasys ?? []).filter((r) => r.category === "food")}
           />
         </Box>
 

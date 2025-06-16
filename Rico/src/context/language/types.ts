@@ -65,7 +65,13 @@ export type TranslationKeys = {
   title:string;
   selectDueDate:string;
   Analyze:string;
- 
+  contact:string;
+  priority: string;
+  low: string;
+  medium: string;
+  high: string;
+  delete: string;
+  actions: string;
 
 };
 
