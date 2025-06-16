@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  TextField,
-  Button,
   TableContainer,
   Paper,
   Table,
@@ -17,57 +15,20 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLanguage } from "../context/language/LanguageContext";
 import { Task } from "../types";
-import { getAllTasks, deleteTask ,completeTask } from "../services/task-service";
-
-const mockTasks: Task[] = [
-  {
-    _id: "1",
-    title: "להתקשר ללקוח חדש",
-    isCompleted: false,
-    createdBy: "admin",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    title: "לשלוח הצעת מחיר",
-    isCompleted: false,
-    createdBy: "admin",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+import { getAllTasks, deleteTask, completeTask } from "../services/task-service";
 
 export const ToDoPage: React.FC = () => {
   const { lang, t } = useLanguage();
   const [taskList, setTaskList] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState("");
 
   const fetchAllTasks = async () => {
-     const response = await getAllTasks();
-     setTaskList(response.data);
-  }
-  useEffect(() => {
-   fetchAllTasks()
-  }, []);
-
-  const handleAddTask = () => {
-    if (newTask.trim()) {
-      const now = new Date().toISOString();
-      setTaskList([
-        ...taskList,
-        {
-          _id: Date.now().toString(),
-          title: newTask,
-          isCompleted: false,
-          createdBy: "admin",
-          createdAt: now,
-          updatedAt: now,
-        },
-      ]);
-      setNewTask("");
-    }
+    const response = await getAllTasks();
+    setTaskList(response.data);
   };
+
+  useEffect(() => {
+    fetchAllTasks();
+  }, []);
 
   const handleToggle = async (id: string) => {
     setTaskList((prev) =>
@@ -84,15 +45,29 @@ export const ToDoPage: React.FC = () => {
     await completeTask(id);
   };
 
-  const handleDelete =async (id: string) => {
+  const handleDelete = async (id: string) => {
     setTaskList((prev) => prev.filter((task) => task._id !== id));
     await deleteTask(id);
+  };
+
+  const getPriorityColor = (priority?: string) => {
+    switch ((priority || "medium").toLowerCase()) {
+      case "high":
+        return "#ffcccc"; // light red
+      case "medium":
+        return "#fff4cc"; // light yellow
+      case "low":
+        return "#d5f5e3"; // light green
+      default:
+        return "#f0f0f0"; // default gray
+    }
   };
 
   return (
     <Box
       sx={{
         display: "flex",
+        flexDirection: "column",
         minHeight: "100vh",
         bgcolor: "#e7e1d2",
         direction: lang === "he" ? "rtl" : "ltr",
@@ -100,67 +75,71 @@ export const ToDoPage: React.FC = () => {
         py: 4,
       }}
     >
-      <Box sx={{ flex: 1 }}>
-        {/* Header */}
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          {t("todo")}
-        </Typography>
+      {/* Header */}
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        {t("todo")}
+      </Typography>
 
-        {/* Task Table */}
-        <TableContainer
-          component={Paper}
-          sx={{
-            borderRadius: 2,
-            boxShadow: "0 2px 8px #0001",
-            overflow: "hidden",
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: "#f5f2e7" }}>
-                <TableCell sx={headCellSx} align="center">
-                  {t("task")}
+      {/* Task Table */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 2px 8px #0001",
+          overflow: "hidden",
+        }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: "#f5f2e7" }}>
+              <TableCell sx={headCellSx} align="center">
+                {t("task")}
+              </TableCell>
+              <TableCell sx={headCellSx} align="center">
+                {t("status")}
+              </TableCell>
+              <TableCell sx={headCellSx} align="center">
+                {t("priority")}
+              </TableCell>
+              <TableCell sx={headCellSx} align="center">
+                {t("actions")}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {taskList.map((task) => (
+              <TableRow
+                key={task._id}
+                sx={{ backgroundColor: getPriorityColor(task.priority) }}
+              >
+                <TableCell sx={bodyCellSx} align="center">
+                  {task.title}
                 </TableCell>
-                <TableCell sx={headCellSx} align="center">
-                  {t("status")}
+                <TableCell sx={bodyCellSx} align="center">
+                  {t(task.isCompleted ? "done" : "notDone")}
                 </TableCell>
-                <TableCell sx={headCellSx} align="center">{t("priority")}</TableCell>
-                <TableCell sx={headCellSx} align="center">{t("actions")}</TableCell>
+                <TableCell sx={bodyCellSx} align="center">
+                  {t(task.priority ?? "medium")}
+                </TableCell>
+                <TableCell sx={bodyCellSx} align="center">
+                  <Checkbox
+                    checked={task.isCompleted}
+                    onChange={() => handleToggle(task._id)}
+                  />
+                  <IconButton onClick={() => handleDelete(task._id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {/* TODO :: Add pagination - only display 15 each time */}
-              {taskList.map((task) => (
-                <TableRow key={task._id}>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {task.title}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {t(task.isCompleted ? "done" : "notDone")}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {t(task.priority?? "medium")}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
-                    <Checkbox
-                      checked={task.isCompleted}
-                      onChange={() => handleToggle(task._id)}
-                    />
-                    <IconButton onClick={() => handleDelete(task._id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };
 
-// Cell styles
+// Styles
 const headCellSx = {
   fontWeight: "bold",
   fontSize: 16,

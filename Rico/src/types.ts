@@ -38,6 +38,22 @@ export interface Review {
   updatedAt: string;
 }
 
+export interface ReviewForUser {
+  _id: string;
+  text: string;
+  createdAt: string;
+  businessId: {
+    _id: string;
+    BusinessName: string;
+  };
+}
+
+export interface SendEmailPayload {
+  reviewId: string;
+  adminResponse: string;
+  customerEmail: string;
+}
+
 export interface ReviewAnalysis extends Document {
   reviewId:string;
   userId?: string | null | {
