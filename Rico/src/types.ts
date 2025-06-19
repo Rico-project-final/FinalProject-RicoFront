@@ -23,7 +23,7 @@ export interface User {
     profileImage: string;
     role: 'admin' | 'customer';
 }
-export type ReviewCategory = 'food' | 'service' | 'overall';
+export type ReviewCategory = 'food' | 'service' | 'experience';
 
 export interface Review {
   _id: string;
@@ -62,7 +62,7 @@ export interface ReviewAnalysis extends Document {
     email: string;
   }; 
   text: string; 
-  category: 'food' | 'service' | 'overall';
+  category: 'food' | 'service' | 'overall experience';
   sentiment: 'positive' | 'neutral' | 'negative'; 
   analysisSummary: string; 
   suggestions?: string; 

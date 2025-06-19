@@ -3,7 +3,7 @@ import { Review , ReviewForUser} from '../types';
 
 export { CanceledError };
 
-export type ReviewCategory = 'food' | 'service' | 'overall';
+export type ReviewCategory = 'food' | 'service' | 'experience';
 
 
 
