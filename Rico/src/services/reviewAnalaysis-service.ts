@@ -1,5 +1,5 @@
 import apiClient, { CanceledError } from './axios';
-import { ReviewAnalysis } from '../types';
+import { ReviewAnalysis , SendEmailPayload} from '../types';
 
 export { CanceledError };
 
@@ -15,4 +15,8 @@ export const getReviewAnalysisById = (reviewId: string) => {
 
 export const updateReviewAnalysisResolved = (reviewId: string) => {
   return apiClient.post<ReviewAnalysis>(`/analysis/update/${reviewId}`);
+};
+
+export const sendAdminResponseEmail = (payload: SendEmailPayload) => {
+  return apiClient.post('/analysis/sendEmail', payload);
 };
