@@ -32,6 +32,3 @@ export const getDashboardStats = () => {
   }>('/users/dashboard');
 }
 
-export const generateBusinessQr = () => {
-  return apiClient.post<{ image: string; message: string }>('/business/generateQR');
-};
