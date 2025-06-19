@@ -18,8 +18,9 @@ import {
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats, generateBusinessQr } from "../services/user-service";
-import { Review } from "../types";
-import CommentModal from "../components/commentModal"; // 👈 Import your modal component
+import { Review, ReviewAnalysis } from "../types";
+import CommentModal from "../components/commentModal";
+import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Array<{
@@ -54,9 +55,9 @@ export const Dashboard: React.FC = () => {
 
   const [totalStats, setTotalStats] = useState({ totalReviews: 0, totalClients: 0, totalTasks: 0 });
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<any>();
+  const [reviewChartData, setReviewChartData] = useState<any[]>([]);
   const [qrImage, setQrImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [selectedComment, setSelectedComment] = useState<string>("");
   const [selectedClientName, setSelectedClientName] = useState<string>("");
@@ -64,17 +65,6 @@ export const Dashboard: React.FC = () => {
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
   const { lang, t } = useLanguage();
-
-  const fetchDashboardData = async () => {
-    try {
-      const response = await getDashboardStats();
-      setTotalStats(response.data);
-      setReviews(response.data.lastWeekReviews);
-      setChartData(response.data.chartData);
-    } catch (e: any) {
-      setError("error while loading data");
-    }
-  };
 
   const handleGenerateQR = async () => {
     try {
@@ -92,8 +82,53 @@ export const Dashboard: React.FC = () => {
     setIsCommentModalOpen(true);
   };
 
+  const transformReviewsToChartData = (reviews: ReviewAnalysis[]) => {
+    const months = Array.from({ length: 12 }, (_, i) =>
+      new Date(0, i).toLocaleString("default", { month: "short" })
+    );
+
+    const initialData = months.map((month) => ({
+      name: month,
+      food: 0,
+      service: 0,
+      experience: 0,
+    }));
+
+    reviews.forEach((review) => {
+      const monthIndex = new Date(review.createdAt).getMonth();
+      const categoryKey =
+        review.category === "overall experience" ? "experience" : review.category;
+
+      (initialData[monthIndex] as any)[categoryKey]++;
+    });
+
+    return initialData;
+  };
+
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getDashboardStats();
+        setTotalStats(response.data);
+        setReviews(response.data.lastWeekReviews);
+      } catch (e: any) {
+        setError("error while loading data");
+      }
+    };
+
+    const fetchReviews = async () => {
+      try {
+        const response = await getAllReviewAnalyses();
+        const chart = transformReviewsToChartData(response.data);
+        setReviewChartData(chart);
+      } catch (error) {
+        console.error("Failed to fetch review analyses:", error);
+        setError("Failed to fetch review analyses");
+      }
+    };
+
     fetchDashboardData();
+    fetchReviews();
   }, []);
 
   if (error) return <Typography color="error">{error}</Typography>;
@@ -150,12 +185,9 @@ export const Dashboard: React.FC = () => {
               backgroundColor: "#fff",
             }}
           >
-            <Typography
-              sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}
-            >
+            <Typography sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}>
               {t("reviewsAddedThisWeek")}
             </Typography>
-            {/* TODO :: Add pagination - only 5 comments */}
             {reviews.map((c, i) => (
               <Box key={i} sx={{ mb: 2 }}>
                 <Typography
@@ -201,14 +233,14 @@ export const Dashboard: React.FC = () => {
             </Box>
 
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={chartData}>
+              <LineChart data={reviewChartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey={t("food")} stroke="#6b7cff" />
-                <Line type="monotone" dataKey={t("service")} stroke="#e17cff" />
-                <Line type="monotone" dataKey={t("experience")} stroke="#ff7c7c" />
+                <Line type="monotone" dataKey="food" stroke="#6b7cff" />
+                <Line type="monotone" dataKey="service" stroke="#e17cff" />
+                <Line type="monotone" dataKey="experience" stroke="#ff7c7c" />
               </LineChart>
             </ResponsiveContainer>
           </Paper>

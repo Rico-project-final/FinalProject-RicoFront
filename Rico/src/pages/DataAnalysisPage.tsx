@@ -16,7 +16,6 @@ export const DataAnalysisPage: React.FC = () => {
   const fetchReviews = async () => {
     try {
       const response = await getAllReviewAnalyses();
-      console.log("API raw response:", response); 
       setReviewsAnalasys(response.data); 
     } catch (error) {
       console.error("Failed to fetch review analyses:", error);
@@ -26,12 +25,6 @@ export const DataAnalysisPage: React.FC = () => {
 
   fetchReviews();
 }, []);
-
-  useEffect(() => {
-  if (reviewsAnalasys) {
-    console.log("Fetched review analyses (updated state):", reviewsAnalasys);
-  }
-}, [reviewsAnalasys]);
 
   return (
     <Box
