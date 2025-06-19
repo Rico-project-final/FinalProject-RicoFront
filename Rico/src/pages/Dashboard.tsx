@@ -17,7 +17,8 @@ import {
 } from "recharts";
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
-import { getDashboardStats, generateBusinessQr } from "../services/user-service";
+import { getDashboardStats } from "../services/user-service";
+import { generateBusinessQr } from "../services/business-service";
 import { Review } from "../types";
 import CommentModal from "../components/commentModal";
 

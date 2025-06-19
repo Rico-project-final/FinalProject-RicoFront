@@ -68,7 +68,9 @@ registerBusiness(data: { email: string; password: string; name: string; companyN
       password,
     });
   },
-
+  verifyEmail(token: string): ApiRequest {
+    return this.createCancellableRequest(`/auth/verifyEmail?token=${token}`, 'GET');
+  },
   // Logout
   logout(): ApiRequest {
     return this.createCancellableRequest('/auth/logout', 'POST');

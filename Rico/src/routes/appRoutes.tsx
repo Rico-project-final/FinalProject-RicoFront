@@ -13,6 +13,7 @@ import LandingPage from '../pages/LandingPage';
 import GreetingPage from '../pages/GreetingPage';
 import BusinessRegistrationPage from '../pages/BusinessRegistration';
 import CustomerProfilePage from '../pages/CustomerProfilePage';
+import VerifyEmailPage from '../pages/VerifyEmailPage';
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
@@ -39,6 +40,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
       <Route path="/" element={<BusinessRegistrationPage />}/>
       <Route path="/review/:businessId" element={<LandingPage />} />
       <Route path="/customerProfile" element={<CustomerProfilePage />}/>
+      <Route path="/verifyEmail" element={<VerifyEmailPage />} />
       <Route path="/deniedAccess" element={<LoginPage />}/>
       <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={

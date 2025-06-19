@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import authService from '../services/auth-service';
-import {User} from '../types'
-import { UserRole } from '../types'; // Import UserRole enum
-
+import { User } from '../types';
+import { UserRole } from '../types';
 
 // Define the shape of the context
 interface AuthContextType {
@@ -11,17 +10,17 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   isAdmin: boolean;
-  isClient: boolean;
-  isGuest: boolean; // Keeping this for convenience, but will calculate differently
+  setUser: (user: User | null) => void;
+
   login: (email: string, password: string) => Promise<void>;
-  registerUser: (email: string, password: string, name: string , phone?:string) => Promise<void>;
-  registerBusiness: (email: string, password: string, name: string , companyName:string, phone?:string) => Promise<void>;
-registerBusinessWithGoogle: (
-  credential: string,
-  password: string,
-  companyName: string,
-  phone?: string
-) => Promise<void>;
+  registerUser: (email: string, password: string, name: string, phone?: string) => Promise<{ message: string }>;
+  registerBusiness: (email: string, password: string, name: string, companyName: string, phone?: string) => Promise<void>;
+  registerBusinessWithGoogle: (
+    credential: string,
+    password: string,
+    companyName: string,
+    phone?: string
+  ) => Promise<void>;
   logout: () => void;
   loginWithGoogle: (credential: string) => Promise<void>;
   clearError: () => void;
@@ -50,8 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if user is already logged in on component mount
-   useEffect(() => {
+  useEffect(() => {
     const initAuth = async () => {
       const currentUser = authService.getCurrentUser();
       if (currentUser) {
@@ -62,15 +60,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  // Login function
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const { request } = authService.login({ email, password });
       const response = await request;
-      
       authService.saveAuth(response.data);
       setUser(response.data.user);
     } catch (err: any) {
@@ -80,14 +75,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
   };
-  // Register function for business
-  const registerBusiness = async (email: string, password: string, name: string , companyName:string  , phone?:string) => {
+
+  const registerBusiness = async (email: string, password: string, name: string, companyName: string, phone?: string) => {
     setIsLoading(true);
-    setError(null); 
+    setError(null);
     try {
       const { request } = authService.registerBusiness({ email, password, companyName, name, phone });
       const response = await request;
-
       authService.saveAuth(response.data);
       setUser(response.data.user);
     } catch (err: any) {
@@ -96,38 +90,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-    
   };
 
-  // Register function
-  const registerUser = async (email : string, password : string, name : string , phone? : string) => {
-  setIsLoading(true);
-  setError(null);
+  const registerUser = async (
+    email: string,
+    password: string,
+    name: string,
+    phone?: string
+  ): Promise<{ message: string }> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { request } = authService.registerUser({ email, password, name, phone });
+      const response = await request;
+      return response.data;
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Registration failed';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  try {
-    const { request } = authService.registerUser({ email, password , name, phone });
-    const response = await request;
-
-    authService.saveAuth(response.data);
-    setUser(response.data.user);
-  } catch (err: any) {
-    setError(err.response?.data?.message || 'Registration failed');
-    throw err;
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-  // Logout function
   const logout = async () => {
     try {
-      // Call logout API if user is authenticated
       if (user) {
         const { request } = await authService.logout();
         authService.clearAuth();
         setUser(null);
-        // We don't need to await this, as we want to log out immediately
         request.catch(err => console.error('Logout error:', err));
       }
     } catch (err: any) {
@@ -135,15 +126,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Google Login function
   const loginWithGoogle = async (credential: string) => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const { request } = authService.loginWithGoogleToken(credential);
       const response = await request;
-      
       authService.saveAuth(response.data);
       setUser(response.data.user);
     } catch (err: any) {
@@ -155,66 +143,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const registerBusinessWithGoogle = async (
-  credential: string,
-  password: string,
-  companyName: string,
-  phone?: string
-): Promise<void> => {
-  setIsLoading(true);
-  setError(null);
+    credential: string,
+    password: string,
+    companyName: string,
+    phone?: string
+  ): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { request } = authService.businessGoogleSignUp(
+        credential,
+        companyName,
+        phone ?? '',
+        password
+      );
+      const response = await request;
+      authService.saveAuth(response.data);
+      setUser(response.data.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Google business registration failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  try {
-    const { request } = authService.businessGoogleSignUp(
-      credential,
-      companyName,
-      phone?? '',
-      password
-    );
-    const response = await request;
-
-    authService.saveAuth(response.data);
-    setUser(response.data.user);
-  } catch (err: any) {
-    setError(err.response?.data?.message || 'Google business registration failed');
-    throw err;
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-  // Clear error function
   const clearError = () => {
     setError(null);
   };
 
-  // Role check helpers
   const isAdmin = user?.role === UserRole.ADMIN;
-  const isClient = user?.role === UserRole.CLIENT;
-  const isGuest = !isAdmin && !isClient; // Anyone who is not an admin or client is a guest
 
-  // Context value
-  const value = {
+  const value: AuthContextType = {
     user,
-    isAuthenticated: !!user, // If we have a user object, they are authenticated
+    isAuthenticated: !!user,
     isLoading,
     error,
     isAdmin,
-    isClient,
-    isGuest,
+    setUser, // ✅ Make setUser accessible
     login,
     registerUser,
     registerBusiness,
     registerBusinessWithGoogle,
     logout,
     loginWithGoogle,
-    clearError
+    clearError,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

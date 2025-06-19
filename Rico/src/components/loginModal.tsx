@@ -3,7 +3,6 @@ import logo from '../assets/rico-logo.png';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/auth-context';
 import { useLanguage } from '../context/language/LanguageContext';
-
 import {
   Box,
   Typography,
@@ -13,6 +12,8 @@ import {
   TextField,
   Button,
   Link,
+  Snackbar,
+  Alert as MuiAlert,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -21,13 +22,23 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+const Alert = MuiAlert as React.FC<
+  React.PropsWithChildren<{
+    onClose: () => void;
+    severity: 'success' | 'error';
+    sx?: object;
+  }>
+>;
+
 const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-
   const [password, setPassword] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const {
     login,
@@ -64,12 +75,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const handleRegister = async () => {
     clearError();
     try {
-      await registerUser(email, password, name, phone);
+      const response = await registerUser(email, password, name, phone);
 
+      setSnackbarMessage(response?.message || 'Registration successful. Please check your email to verify your account.');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
       onClose();
-      alert(`${t('welcome')}, ${name}!`);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Register failed:', err);
+      setSnackbarMessage(err?.response?.data?.message || 'Registration failed. Please try again.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
 
@@ -121,22 +137,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {isRegisterMode && (
             <>
-            <TextField
-              label={t('name')}
-              variant="outlined"
-              fullWidth
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              sx={{ backgroundColor: 'white', borderRadius: 1 }}
-            />
-            <TextField
-              label={t('phone')}
-              variant="outlined"
-              fullWidth
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              sx={{ backgroundColor: 'white', borderRadius: 1 }}
-            />
+              <TextField
+                label={t('name')}
+                variant="outlined"
+                fullWidth
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                sx={{ backgroundColor: 'white', borderRadius: 1 }}
+              />
+              <TextField
+                label={t('phone')}
+                variant="outlined"
+                fullWidth
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                sx={{ backgroundColor: 'white', borderRadius: 1 }}
+              />
             </>
           )}
           <TextField
@@ -199,28 +215,55 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             </Typography>
           )}
 
-          <Box sx={{ mt: 2 ,display: 'flex', justifyContent: 'center', alignItems: 'center' , gap: 1}}>
-             <Link
-                component="button"
-                onClick={switchMode}
-                sx={{ ml: 1,  background: '#fff',
-                  borderRadius: '1rem',
-                  padding: '0.75rem',
-                  fontSize: '1rem',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                  color: 'black',
-                  textTransform: 'none',
-                  '&:hover': {
-                    background: '#eee',
-                  },}}
-                  >
-                {isRegisterMode ? t('login') : t('register')}
-              </Link>
+          <Box
+            sx={{
+              mt: 2,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 1,
+            }}
+          >
+            <Link
+              component="button"
+              onClick={switchMode}
+              sx={{
+                ml: 1,
+                background: '#fff',
+                borderRadius: '1rem',
+                padding: '0.75rem',
+                fontSize: '1rem',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                color: 'black',
+                textTransform: 'none',
+                '&:hover': {
+                  background: '#eee',
+                },
+              }}
+            >
+              {isRegisterMode ? t('login') : t('register')}
+            </Link>
             <Typography variant="body2">
               {isRegisterMode ? t('alreadyHaveAccount') : t('noAccount')}
             </Typography>
           </Box>
         </Box>
+
+        {/* ✅ Snackbar component */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </DialogContent>
     </Dialog>
   );
