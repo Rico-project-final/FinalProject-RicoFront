@@ -18,17 +18,20 @@ const lightTheme = createTheme({
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
-      main: '#f1e0c6', // Light skin tone color
-    },
-    secondary: {
-      main: '#212121', // Matte black color
+      main: "#90caf9",
     },
     background: {
-      default: '#121212', // Dark background color
+      default: "#222831", 
+      paper: "#2e3440",   
+    },
+    text: {
+      primary: "#eeeeee",
+      secondary: "#b0bec5",
     },
   },
 });
+
 
 export { lightTheme, darkTheme };

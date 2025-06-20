@@ -11,6 +11,7 @@ import {
   TableBody,
   Checkbox,
   IconButton,
+  useTheme,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLanguage } from "../context/language/LanguageContext";
@@ -19,6 +20,7 @@ import { getAllTasks, deleteTask, completeTask } from "../services/task-service"
 
 export const ToDoPage: React.FC = () => {
   const { lang, t } = useLanguage();
+  const theme = useTheme();
   const [taskList, setTaskList] = useState<Task[]>([]);
 
   const fetchAllTasks = async () => {
@@ -50,16 +52,18 @@ export const ToDoPage: React.FC = () => {
     await deleteTask(id);
   };
 
+  // Adjust priority colors for dark mode
   const getPriorityColor = (priority?: string) => {
+    const mode = theme.palette.mode;
     switch ((priority || "medium").toLowerCase()) {
       case "high":
-        return "#ffcccc"; // light red
+        return mode === "dark" ? "#663333" : "#ffcccc"; // darker red in dark mode
       case "medium":
-        return "#fff4cc"; // light yellow
+        return mode === "dark" ? "#665e33" : "#fff4cc"; // darker yellow in dark mode
       case "low":
-        return "#d5f5e3"; // light green
+        return mode === "dark" ? "#335d33" : "#d5f5e3"; // darker green in dark mode
       default:
-        return "#f0f0f0"; // default gray
+        return mode === "dark" ? theme.palette.background.paper : "#f0f0f0";
     }
   };
 
@@ -69,10 +73,11 @@ export const ToDoPage: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        bgcolor: "#e7e1d2",
+        bgcolor: theme.palette.background.default,
         direction: lang === "he" ? "rtl" : "ltr",
         px: 4,
         py: 4,
+        color: theme.palette.text.primary,
       }}
     >
       {/* Header */}
@@ -87,11 +92,12 @@ export const ToDoPage: React.FC = () => {
           borderRadius: 2,
           boxShadow: "0 2px 8px #0001",
           overflow: "hidden",
+          backgroundColor: theme.palette.background.paper,
         }}
       >
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#f5f2e7" }}>
+            <TableRow sx={{ bgcolor: theme.palette.action.hover }}>
               <TableCell sx={headCellSx} align="center">
                 {t("task")}
               </TableCell>
@@ -125,8 +131,9 @@ export const ToDoPage: React.FC = () => {
                   <Checkbox
                     checked={task.isCompleted}
                     onChange={() => handleToggle(task._id)}
+                    color="primary"
                   />
-                  <IconButton onClick={() => handleDelete(task._id)}>
+                  <IconButton onClick={() => handleDelete(task._id)} color="error">
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>
@@ -144,10 +151,13 @@ const headCellSx = {
   fontWeight: "bold",
   fontSize: 16,
   py: 2,
-  borderBottom: "2px solid #e0d7c6",
+  borderBottom: "2px solid",
+  borderColor: "divider",
 };
 
 const bodyCellSx = {
   fontSize: 15,
   py: 1.5,
 };
+
+export default ToDoPage;

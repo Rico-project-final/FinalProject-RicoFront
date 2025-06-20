@@ -7,6 +7,7 @@ import {
   Paper,
   Button,
   TextField,
+  useTheme,
 } from "@mui/material";
 import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ import { getReviewsByUser } from "../services/review-service";
 import CommentModal from "../components/commentModal";
 
 const CustomerProfilePage: React.FC = () => {
+  const theme = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const [reviews, setReviews] = useState<ReviewForUser[]>([]);
@@ -46,12 +48,10 @@ const CustomerProfilePage: React.FC = () => {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    // Clear any existing debounce timer
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
 
-    // Set a new debounce timer
     debounceTimeout.current = setTimeout(() => {
       if (searchTerm.trim() === "") {
         setFilteredReviews(reviews);
@@ -71,9 +71,8 @@ const CustomerProfilePage: React.FC = () => {
       });
 
       setFilteredReviews(filtered);
-    }, 500); // 500ms debounce delay
+    }, 500);
 
-    // Cleanup function to clear timeout if searchTerm changes quickly
     return () => {
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
@@ -87,7 +86,15 @@ const CustomerProfilePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 4, position: "relative" }}>
+    <Box
+      sx={{
+        p: 4,
+        position: "relative",
+        bgcolor: theme.palette.mode === "dark" ? "#121212" : "background.default",
+        color: theme.palette.text.primary,
+        minHeight: "100vh",
+      }}
+    >
       {/* Sticky Logout Button */}
       <Button
         onClick={handleLogout}
@@ -99,28 +106,56 @@ const CustomerProfilePage: React.FC = () => {
           right: 16,
           zIndex: 999,
           fontWeight: "bold",
+          bgcolor: theme.palette.mode === "dark" ? "#333" : undefined,
+          "&:hover": {
+            bgcolor: theme.palette.mode === "dark" ? "#444" : undefined,
+          },
         }}
       >
         Logout
       </Button>
 
       {/* Header */}
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: "bold", textAlign: "center" }}>
+      <Typography
+        variant="h4"
+        sx={{
+          mb: 4,
+          fontWeight: "bold",
+          textAlign: "center",
+          color: theme.palette.text.primary,
+        }}
+      >
         Welcome back, {user?.name}!
       </Typography>
 
       {/* User Info */}
-      <Paper sx={{ p: 3, mb: 4, maxWidth: 600, mx: "auto" }}>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 4,
+          maxWidth: 600,
+          mx: "auto",
+          bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
+          color: theme.palette.text.primary,
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Avatar
             src={user?.profileImage || "/default-user.png"}
             sx={{ width: 64, height: 64 }}
           />
           <Box>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
+            <Typography
+              variant="h6"
+              sx={{ textAlign: "center", color: theme.palette.text.primary }}
+            >
               {user?.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+            <Typography
+              variant="body2"
+              color={theme.palette.text.secondary}
+              sx={{ textAlign: "center" }}
+            >
               {user?.email}
             </Typography>
           </Box>
@@ -128,7 +163,10 @@ const CustomerProfilePage: React.FC = () => {
       </Paper>
 
       {/* Reviews Section */}
-      <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+      <Typography
+        variant="h6"
+        sx={{ mb: 2, textAlign: "center", color: theme.palette.text.primary }}
+      >
         Your Reviews
       </Typography>
 
@@ -140,6 +178,26 @@ const CustomerProfilePage: React.FC = () => {
           placeholder="Search by business name or review text..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            sx: {
+              bgcolor: theme.palette.mode === "dark" ? "#2c2c2c" : undefined,
+              color: theme.palette.text.primary,
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.mode === "dark" ? "#555" : undefined,
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.mode === "dark" ? "#888" : undefined,
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: theme.palette.mode === "dark" ? "#aaa" : undefined,
+              },
+            },
+          }}
+          sx={{
+            input: {
+              color: theme.palette.text.primary,
+            },
+          }}
         />
       </Box>
 
@@ -152,10 +210,16 @@ const CustomerProfilePage: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           gap: 2,
+          bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
+          color: theme.palette.text.primary,
         }}
       >
         {filteredReviews.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+          <Typography
+            variant="body2"
+            color={theme.palette.text.secondary}
+            sx={{ textAlign: "center" }}
+          >
             No reviews found.
           </Typography>
         ) : (
@@ -167,10 +231,10 @@ const CustomerProfilePage: React.FC = () => {
                 cursor: "pointer",
                 p: 2,
                 borderRadius: 2,
-                boxShadow: 1,
-                bgcolor: "background.paper",
+                boxShadow: theme.palette.mode === "dark" ? "0 0 8px #222" : 1,
+                bgcolor: theme.palette.mode === "dark" ? "#2c2c2c" : "background.paper",
                 "&:hover": {
-                  bgcolor: "grey.100",
+                  bgcolor: theme.palette.mode === "dark" ? "#3a3a3a" : "grey.100",
                 },
                 textAlign: "center",
               }}
@@ -178,18 +242,22 @@ const CustomerProfilePage: React.FC = () => {
               <Typography
                 variant="subtitle2"
                 fontWeight="bold"
-                color="gray"
+                color={theme.palette.mode === "dark" ? "#aaa" : "gray"}
                 sx={{ mb: 1 }}
               >
                 {review.businessId?.BusinessName || "Unknown Business"}
               </Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
+              <Typography variant="body1" sx={{ mb: 1, color: theme.palette.text.primary }}>
                 {review.text.length > 100
                   ? `${review.text.slice(0, 100)}... (click to read more)`
                   : review.text}
               </Typography>
-              <Divider />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+              <Divider sx={{ borderColor: theme.palette.divider }} />
+              <Typography
+                variant="caption"
+                color={theme.palette.text.secondary}
+                sx={{ mt: 1 }}
+              >
                 Created at: {new Date(review.createdAt).toLocaleDateString()}
               </Typography>
             </Box>

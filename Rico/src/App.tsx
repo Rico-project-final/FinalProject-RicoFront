@@ -1,33 +1,37 @@
-import './App.css'
-import { BrowserRouter as Router } from 'react-router-dom';
-import { LanguageProvider } from './context/language/LanguageContext'
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ThemeProvider } from '@mui/material/styles';
-import AppRoutes from './routes/appRoutes'
-import { AuthProvider } from './context/auth-context';
-import { useState } from 'react';
-import { lightTheme, darkTheme } from './theme';
+import { BrowserRouter as Router } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { LanguageProvider } from "./context/language/LanguageContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "./context/auth-context";
+import { useCustomTheme, CustomThemeProvider } from "./context/ThemeContext";
+import AppRoutes from "./routes/appRoutes";
 
-
-function App() {
-   const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const handleToggle = () => {
-    setIsDarkMode((prev) => !prev);
-  };
+function AppWrapper() {
   return (
     <LanguageProvider>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-          <AuthProvider>
-                  <Router>
-                      <AppRoutes handleToggle={handleToggle} isDarkMode={isDarkMode} />
-                  </Router>
-          </AuthProvider>
-          </ThemeProvider>
+        <CustomThemeProvider>
+          <App />
+        </CustomThemeProvider>
       </GoogleOAuthProvider>
-     </LanguageProvider>
-  )
+    </LanguageProvider>
+  );
 }
 
-export default App
+// ✅ Main App component with dark/light theme support
+function App() {
+  const { mode, toggleTheme, theme } = useCustomTheme(); 
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <Router>
+          <AppRoutes/>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default AppWrapper;

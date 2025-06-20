@@ -4,7 +4,7 @@ import {
   Typography,
   Paper,
   Button,
-  Divider
+  Divider,
 } from "@mui/material";
 import {
   LineChart,
@@ -13,44 +13,44 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
+import { useTheme } from "@mui/material/styles";
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats } from "../services/user-service";
 import { generateBusinessQr } from "../services/business-service";
-import { Review } from "../types";
+import { Review, ReviewAnalysis } from "../types";
 import CommentModal from "../components/commentModal";
 import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
 
 export const Dashboard: React.FC = () => {
+  const theme = useTheme();
+  const { lang, t } = useLanguage();
+
   const [stats, setStats] = useState<Array<{
     label: keyof TranslationKeys;
     icon: string;
     changeColor: string;
     changeText: keyof TranslationKeys;
-    bg: string;
   }>>([
     {
       label: "totalClients",
       icon: "👤",
       changeColor: "green",
       changeText: "upFromYesterday",
-      bg: "#f3f0ea",
     },
     {
       label: "totalTasks",
       icon: "📈",
       changeColor: "red",
       changeText: "downFromYesterday",
-      bg: "#eafaf3",
     },
     {
       label: "totalReviews",
       icon: "💬",
       changeColor: "green",
       changeText: "upFromYesterday",
-      bg: "#faecea",
     },
   ]);
 
@@ -64,8 +64,6 @@ export const Dashboard: React.FC = () => {
   const [selectedClientName, setSelectedClientName] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string | Date>(new Date());
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
-
-  const { lang, t } = useLanguage();
 
   const handleGenerateQR = async () => {
     try {
@@ -139,12 +137,15 @@ export const Dashboard: React.FC = () => {
       sx={{
         display: "flex",
         minHeight: "100vh",
-        backgroundColor: "#e7e1d2",
+        backgroundColor: theme.palette.background.default,
         direction: lang === "he" ? "rtl" : "ltr",
       }}
     >
       <Box sx={{ flex: 1, p: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
+        <Typography
+          variant="h4"
+          sx={{ mb: 3, color: theme.palette.text.primary }}
+        >
           {t("dashboard")}
         </Typography>
 
@@ -154,7 +155,7 @@ export const Dashboard: React.FC = () => {
             <Paper
               key={stat.label}
               sx={{
-                backgroundColor: "#fff",
+                backgroundColor: theme.palette.background.paper,
                 borderRadius: 2,
                 boxShadow: 3,
                 p: 3,
@@ -165,10 +166,14 @@ export const Dashboard: React.FC = () => {
                 gap: 1,
               }}
             >
-              <Typography sx={{ fontSize: 14, color: "#888" }}>
+              <Typography
+                sx={{ fontSize: 14, color: theme.palette.text.secondary }}
+              >
                 {t(stat.label)}
               </Typography>
-              <Typography sx={{ fontSize: 28 }}>
+              <Typography
+                sx={{ fontSize: 28, color: theme.palette.text.primary }}
+              >
                 {totalStats[stat.label as keyof typeof totalStats]} {stat.icon}
               </Typography>
             </Paper>
@@ -183,16 +188,29 @@ export const Dashboard: React.FC = () => {
               flex: 1,
               p: 3,
               borderRadius: 2,
-              backgroundColor: "#fff",
+              backgroundColor: theme.palette.background.paper,
             }}
           >
-            <Typography sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}>
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                fontSize: 20,
+                textAlign: "center",
+                mb: 2,
+                color: theme.palette.text.primary,
+              }}
+            >
               {t("reviewsAddedThisWeek")}
             </Typography>
             {reviews.map((c, i) => (
               <Box key={i} sx={{ mb: 2 }}>
                 <Typography
-                  sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
+                  sx={{
+                    mb: 1,
+                    cursor: "pointer",
+                    fontSize: 14,
+                    color: theme.palette.text.primary,
+                  }}
                   onClick={() =>
                     handleOpenModal(
                       c.text,
@@ -203,7 +221,14 @@ export const Dashboard: React.FC = () => {
                 >
                   {c.text}
                 </Typography>
-                {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
+                {i < reviews.length - 1 && (
+                  <Divider
+                    sx={{
+                      mt: 2,
+                      borderColor: theme.palette.divider,
+                    }}
+                  />
+                )}
               </Box>
             ))}
           </Paper>
@@ -214,7 +239,7 @@ export const Dashboard: React.FC = () => {
               flex: 1,
               p: 3,
               borderRadius: 2,
-              backgroundColor: "#fff",
+              backgroundColor: theme.palette.background.paper,
             }}
           >
             <Box
@@ -225,20 +250,28 @@ export const Dashboard: React.FC = () => {
                 mb: 1,
               }}
             >
-              <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
+              <Typography
+                sx={{ fontWeight: "bold", fontSize: 20, color: theme.palette.text.primary }}
+              >
                 {t("allAreas")}
               </Typography>
-              <Typography sx={{ fontSize: 14, color: "#888" }}>
+              <Typography
+                sx={{ fontSize: 14, color: theme.palette.text.secondary }}
+              >
                 {t("thisYear")} ▼
               </Typography>
             </Box>
 
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={reviewChartData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="name" stroke={theme.palette.text.secondary} />
+                <YAxis stroke={theme.palette.text.secondary} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }}
+                  labelStyle={{ color: theme.palette.text.primary }}
+                  itemStyle={{ color: theme.palette.text.primary }}
+                />
+                <Legend wrapperStyle={{ color: theme.palette.text.primary }} />
                 <Line type="monotone" dataKey="food" stroke="#6b7cff" />
                 <Line type="monotone" dataKey="service" stroke="#e17cff" />
                 <Line type="monotone" dataKey="experience" stroke="#ff7c7c" />
@@ -253,18 +286,20 @@ export const Dashboard: React.FC = () => {
             mt: 4,
             p: 3,
             borderRadius: 2,
-            backgroundColor: "#fff",
+            backgroundColor: theme.palette.background.paper,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: 2,
           }}
         >
-          <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
-            generate QR
+          <Typography
+            sx={{ fontWeight: "bold", fontSize: 20, color: theme.palette.text.primary }}
+          >
+            generateQR
           </Typography>
           <Button onClick={handleGenerateQR} variant="contained">
-            generate QR
+            generateQR
           </Button>
 
           {qrImage && (
@@ -283,7 +318,7 @@ export const Dashboard: React.FC = () => {
                 }}
                 variant="outlined"
               >
-                download QR
+                downloadQR
               </Button>
             </>
           )}
