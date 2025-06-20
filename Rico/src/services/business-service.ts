@@ -9,4 +9,6 @@ export const generateBusinessQr = () => {
   return apiClient.post<{ image: string; message: string }>('/business/generateQR');
 };
 
-
+export const sendResponseToCustomer = (email : string , text : string) => {
+  return apiClient.post<{ message: string }>('/business/sendEmailResponse', {email,text});
+};

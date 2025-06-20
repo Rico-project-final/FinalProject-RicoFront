@@ -8,44 +8,47 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
   IconButton,
-  Menu,
-  MenuItem as MuiMenuItem,
   TextField,
 } from "@mui/material";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import { useLanguage } from "../context/language/LanguageContext";
-import {getAllUsers} from "../services/user-service";
+import { getAllUsers } from "../services/user-service";
+import SendEmailModal from "../components/SendEmailModal";
 import { User } from "../types";
 
 export const ClientsPage: React.FC = () => {
   const { lang, t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState("");
+  const [selectedText, setSelectedText] = useState("");
 
-
-  const fetchAllUsers = async ()=>{
+  const fetchAllUsers = async () => {
     try {
       const response = await getAllUsers();
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  }
-  const handleContact = ()=>{
-    //TODO :: contact client using somehting?
-    console.log("handle contact activated")
-  }
+  };
+
+  const handleContact = (email: string, text: string) => {
+    setSelectedEmail(email);
+    setSelectedText(text);
+    setModalOpen(true);
+  };
+
   const filteredClients = users.filter((c) =>
-  [c.name,c.email, c._id, c.phone ?? ''].some((field) => field?.includes(search))
-);
+    [c.name, c.email, c._id, c.phone ?? ""].some((field) =>
+      field?.includes(search)
+    )
+  );
 
-
-useEffect(()=>{
-    fetchAllUsers()
-
-  },[])
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
 
   return (
     <Box
@@ -78,23 +81,36 @@ useEffect(()=>{
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: "#f5f2e7" }}>
-                <TableCell sx={headCellSx} align="center">{t("id")}</TableCell>
-                <TableCell sx={headCellSx} align="center">{t("email")}</TableCell>
-                <TableCell sx={headCellSx} align="center">{t("name")}</TableCell>
-                <TableCell sx={headCellSx} align="center">{t("contact")}</TableCell>
+                <TableCell sx={headCellSx} align="center">
+                  {t("id")}
+                </TableCell>
+                <TableCell sx={headCellSx} align="center">
+                  {t("email")}
+                </TableCell>
+                <TableCell sx={headCellSx} align="center">
+                  {t("name")}
+                </TableCell>
+                <TableCell sx={headCellSx} align="center">
+                  {t("contact")}
+                </TableCell>
                 <TableCell sx={headCellSx} align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* TODO :: Add pagination - only display 15 each time */}
               {filteredClients.map((c) => (
                 <TableRow key={c._id} sx={{ textAlign: "center" }}>
-                  <TableCell sx={bodyCellSx} align="center">{c._id.slice(-6)}</TableCell>
-                  <TableCell sx={bodyCellSx} align="center">{c.email}</TableCell>
-                  <TableCell sx={bodyCellSx} align="center">{c.name}</TableCell>
+                  <TableCell sx={bodyCellSx} align="center">
+                    {c._id.slice(-6)}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx} align="center">
+                    {c.email}
+                  </TableCell>
+                  <TableCell sx={bodyCellSx} align="center">
+                    {c.name}
+                  </TableCell>
                   <TableCell sx={[bodyCellSx, { position: "relative" }]} align="center">
                     <IconButton
-                      onClick={handleContact}
+                      onClick={() => handleContact(c.email, `Hi ${c.name},`)}
                       size="small"
                     >
                       <ChatBubbleIcon />
@@ -106,6 +122,13 @@ useEffect(()=>{
           </Table>
         </TableContainer>
       </Box>
+
+      <SendEmailModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        email={selectedEmail}
+        text={selectedText}
+      />
     </Box>
   );
 };

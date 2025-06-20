@@ -48,12 +48,6 @@ export interface ReviewForUser {
   };
 }
 
-export interface SendEmailPayload {
-  reviewId: string;
-  adminResponse: string;
-  customerEmail: string;
-}
-
 export interface ReviewAnalysis extends Document {
   reviewId:string;
   userId?: string | null | {
@@ -79,3 +73,4 @@ export interface Business {
   reviews: string[];
   ownerId?: string;
 }
+

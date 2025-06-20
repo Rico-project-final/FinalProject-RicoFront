@@ -6,7 +6,6 @@ export { CanceledError };
 
 // הגדרת המשתנה הסביבתי או ברירת מחדל אם חסר
 const API_URL = import.meta.env.VITE_API_URL;
-console.log('API_URL:', API_URL);
 // יצירת מופע axios עם הגדרות בסיסיות
 const apiClient = axios.create({
   baseURL: API_URL,

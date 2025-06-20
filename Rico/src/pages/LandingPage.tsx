@@ -8,7 +8,6 @@ import { useAuth } from '../context/auth-context';
 import { createReview } from '../services/review-service';
 import { useEffect } from 'react';
 import { getBusinessById } from '../services/business-service';
-import { Business } from '../types';
 
 const LandingPage: React.FC = () => {
   const { businessId } = useParams();

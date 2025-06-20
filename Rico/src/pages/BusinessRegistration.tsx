@@ -13,7 +13,6 @@ import LoginModal from "../components/loginModal";
 import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
-import authService from '../services/auth-service';
 
 
 const BusinessRegistrationPage: React.FC = () => {
@@ -25,7 +24,6 @@ const BusinessRegistrationPage: React.FC = () => {
     registerBusiness,
     isLoading,
     registerBusinessWithGoogle,
-    error,
     clearError,
   } = useAuth();
   const { t } = useLanguage();

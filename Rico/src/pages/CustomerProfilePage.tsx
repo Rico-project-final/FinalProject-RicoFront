@@ -28,7 +28,6 @@ const CustomerProfilePage: React.FC = () => {
       const response = await getReviewsByUser();
       setReviews(response.data);
       setFilteredReviews(response.data);
-      console.log("Fetched reviews:", response.data.length);
     } catch (error) {
       console.error("Failed to fetch reviews", error);
     }

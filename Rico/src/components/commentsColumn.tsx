@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { useLanguage } from "../context/language/LanguageContext";
 import { ReviewAnalysis } from "../types";
-import ReviewAnalysisModal from "./ReviewAnalysisModal";
+import SendEmailModal from "./SendEmailModal";
 
 const CommentsColumn: React.FC<{
   comments: ReviewAnalysis[];
@@ -59,11 +59,12 @@ const CommentsColumn: React.FC<{
         </Paper>
       ))}
 
-      <ReviewAnalysisModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        reviewAnalysis={selectedAnalysis}
-      />
+      <SendEmailModal
+      open={modalOpen}
+      onClose={() => setModalOpen(false)}
+      email={(selectedAnalysis?.userId as { email: string })?.email || ""}
+      text={selectedAnalysis?.adminResponse || ""}
+    />
     </Box>
   );
 };

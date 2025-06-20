@@ -9,8 +9,7 @@ const GreetingPage: React.FC = () => {
   };
 
   return (
-    // If you use a layout wrapper, uncomment this:
-    // <RatingPage>
+
     <Box
       sx={{
         fontFamily: `'Varela Round', 'Baloo', 'Rubik', Arial, sans-serif`,
@@ -57,7 +56,7 @@ const GreetingPage: React.FC = () => {
         לעמוד האישי לחץ כאן
       </Button>
     </Box>
-    // </RatingPage>
+
   );
 };
 
