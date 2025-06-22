@@ -20,10 +20,10 @@ const LandingPage: React.FC = () => {
 
       useEffect(() => {
       const fetchBusiness = async () => {
-        if (!businessId) return; // ✅ Prevent calling with undefined
+        if (!businessId) return; 
 
         try {
-          const res = await getBusinessById(businessId); // ✅ Now TypeScript is happy
+          const res = await getBusinessById(businessId); 
           setBusinessName(res.data.BusinessName);
         } catch (err) {
           console.error("Failed to fetch business info:", err);
@@ -31,7 +31,7 @@ const LandingPage: React.FC = () => {
       };
 
     fetchBusiness();
-    }, [businessId]); // ✅ only re-run when businessId changes
+    }, [businessId]);
     useEffect(() => {
       if (user) {
         if (user.role === 'admin') {

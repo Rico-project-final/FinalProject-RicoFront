@@ -10,7 +10,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  IconButton,
 } from "@mui/material";
 import BedtimeIcon from "@mui/icons-material/Bedtime";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -18,32 +17,51 @@ import logo from "../assets/rico-logo.png";
 
 import { useLanguage } from "../context/language/LanguageContext";
 import { useAuth } from "../context/auth-context";
+import { useCustomTheme } from "../context/ThemeContext";
 
-interface AppNavbarProps {
-  handleToggle: () => void;
-  isDarkMode: boolean;
-}
-
-export default function AppNavbar({ handleToggle, isDarkMode }: AppNavbarProps) {
+export default function AppNavbar() {
   const theme = useTheme();
   const { lang, setLang } = useLanguage();
   const { user } = useAuth();
+  const { toggleTheme, mode } = useCustomTheme();
 
   const handleLangChange = (event: SelectChangeEvent) => {
     setLang(event.target.value as "he" | "en");
   };
 
+  const isDark = theme.palette.mode === "dark";
+
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "primary.main", boxShadow: 3 ,width: '100%'}}>
+    <AppBar
+      position="sticky"
+      sx={{
+        bgcolor: isDark ? theme.palette.background.paper : "primary.main",
+        boxShadow: 3,
+        width: "100%",
+        color: isDark ? theme.palette.text.primary : theme.palette.primary.contrastText,
+      }}
+    >
       <Toolbar>
         {/* Logo & Title */}
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <Link
+            to="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
             <Box
               component="img"
               src={logo}
               alt="Logo"
-              sx={{ width: 40, height: 40 }}
+              sx={{
+                width: 40,
+                height: 40,
+                filter: isDark ? "brightness(0) invert(1)" : "none", // invert logo colors in dark mode if needed
+              }}
             />
           </Link>
         </Box>
@@ -56,48 +74,77 @@ export default function AppNavbar({ handleToggle, isDarkMode }: AppNavbarProps) 
             onChange={handleLangChange}
             size="small"
             sx={{
-              backgroundColor: "#fff",
+              backgroundColor: isDark ? theme.palette.background.default : "#fff",
               borderRadius: 1,
               fontSize: 14,
               minWidth: 100,
               height: 36,
+              color: isDark ? theme.palette.text.primary : "inherit",
               ".MuiSelect-select": {
                 padding: "4px 12px",
               },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: isDark ? theme.palette.divider : undefined,
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: isDark ? theme.palette.primary.light : undefined,
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  bgcolor: isDark ? theme.palette.background.paper : "#fff",
+                  color: isDark ? theme.palette.text.primary : "inherit",
+                },
+              },
             }}
           >
-            <MenuItem value="he">
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                 <span>עברית</span>
-              </Box>
-            </MenuItem>
+            <MenuItem value="he">עברית</MenuItem>
             <MenuItem value="en">English</MenuItem>
           </Select>
 
           {/* 👤 User Info */}
           {user && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Avatar alt={user.name} src={user.profileImage} />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                color: isDark ? theme.palette.text.primary : "inherit",
+              }}
+            >
+              <Avatar
+                alt={user.name}
+                src={user.profileImage}
+                sx={{
+                  border: isDark ? `1px solid ${theme.palette.divider}` : "none",
+                }}
+              />
               <Box sx={{ textAlign: "right" }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: 14 }}>{user.name}</Typography>
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    color: isDark ? theme.palette.text.primary : "inherit",
+                  }}
+                >
+                  {user.name}
+                </Typography>
               </Box>
             </Box>
           )}
 
           {/* 🌗 Theme Toggle */}
           <Button
-            onClick={handleToggle}
+            onClick={toggleTheme}
             sx={{
               ml: 1,
-              color:
-                theme.palette.mode === "dark"
-                  ? theme.palette.secondary.main
-                  : theme.palette.primary.contrastText,
+              color: isDark ? theme.palette.secondary.main : theme.palette.primary.contrastText,
               minWidth: "auto",
             }}
-            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
-            {isDarkMode ? <BedtimeIcon /> : <LightModeIcon />}
+            {mode === "dark" ? <BedtimeIcon /> : <LightModeIcon />}
           </Button>
         </Box>
       </Toolbar>

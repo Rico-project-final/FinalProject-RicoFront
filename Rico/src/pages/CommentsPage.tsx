@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme } from "@mui/material/styles";
 import { useLanguage } from "../context/language/LanguageContext";
 import dayjs from "dayjs";
 import {
@@ -19,6 +20,7 @@ import { Review } from "../types";
 import CommentModal from "../components/commentModal";
 
 export const CommentsPage: React.FC = () => {
+  const theme = useTheme();
   const today = dayjs().format("YYYY-MM-DD");
   const { lang, t } = useLanguage();
   const [allReviews, setAllReviews] = useState<Review[]>([]);
@@ -117,7 +119,7 @@ useEffect(() => {
         display: "flex",
         height: "100vh",
         overflowY: "auto",
-        bgcolor: "#e7e1d2",
+        bgcolor: theme.palette.background.default,
         direction: lang === "he" ? "rtl" : "ltr",
       }}
     >
@@ -138,7 +140,13 @@ useEffect(() => {
             placeholder={t("clientName")}
             value={nameFilter}
             onChange={(e) => setNameFilter(e.target.value)}
-            sx={dateInputSx}
+            sx={{
+              ...dateInputSx,
+              bgcolor: theme.palette.background.paper,
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.primary,
+            }}
+            inputProps={{ style: { fontWeight: "bold", fontSize: 14 } }}
           />
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -146,13 +154,27 @@ useEffect(() => {
               type="date"
               value={dateFilter || ""}
               onChange={(e) => setDateFilter(e.target.value)}
-              sx={dateInputSx}
+              sx={{
+                ...dateInputSx,
+                bgcolor: theme.palette.background.paper,
+                borderColor: theme.palette.divider,
+                color: theme.palette.text.primary,
+              }}
               placeholder="Select date"
               inputProps={{ max: today }}
             />
           </Box>
 
-          <Button variant="outlined" onClick={applyFilters} sx={filterBtnSx}>
+          <Button
+            variant="outlined"
+            onClick={applyFilters}
+            sx={{
+              ...filterBtnSx,
+              bgcolor: theme.palette.background.paper,
+              borderColor: theme.palette.divider,
+              color: theme.palette.text.primary,
+            }}
+          >
             {t("filter")}
           </Button>
           <Button
@@ -183,16 +205,28 @@ useEffect(() => {
           sx={{
             borderRadius: 2,
             overflow: "auto",
-            bgcolor: "#f8f6f2",
+            bgcolor: theme.palette.background.paper,
             minHeight: "400px",
+            color: theme.palette.text.primary,
           }}
         >
           <Table sx={{ minWidth: 650 }} aria-label="comments table">
             <TableHead>
-              <TableRow sx={{ bgcolor: "#ede6d6", textAlign: "center" }}>
-                <TableCell sx={thSx} align="center">{t("clientName")}</TableCell>
-                <TableCell sx={thSx} align="center">{t("date")}</TableCell>
-                <TableCell sx={thSx} align="center">{t("reviewDesc")}</TableCell>
+              <TableRow
+                sx={{
+                  bgcolor: theme.palette.action.hover,
+                  textAlign: "center",
+                }}
+              >
+                <TableCell sx={thSx} align="center" >
+                  {t("clientName")}
+                </TableCell>
+                <TableCell sx={thSx} align="center" >
+                  {t("date")}
+                </TableCell>
+                <TableCell sx={thSx} align="center" >
+                  {t("reviewDesc")}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -211,15 +245,17 @@ useEffect(() => {
                     )
                   }
                 >
-                  <TableCell sx={tdSx} align="center">
-                    {review.userId && typeof review.userId === "object" && "name" in review.userId
+                  <TableCell sx={tdSx} align="center" >
+                    {review.userId !== null &&
+                    typeof review.userId === "object" &&
+                    "name" in review.userId
                       ? review.userId.name
                       : "-"}
                   </TableCell>
-                  <TableCell sx={tdSx} align="center">
+                  <TableCell sx={tdSx} align="center" >
                     {new Date(review.createdAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell sx={{ ...tdSx, maxWidth: 300 }} align="center">
+                  <TableCell sx={{ ...tdSx, maxWidth: 300 }} align="center" >
                     <Box
                       sx={{
                         whiteSpace: "nowrap",
@@ -261,7 +297,7 @@ useEffect(() => {
 // Styles
 const filterBtnSx = {
   borderRadius: "20px",
-  bgcolor: "#f3f0ea",
+  bgcolor: "#f3f0ea", // will override below for theme-based in component
   border: "1px solid #cfc6b0",
   fontWeight: "bold",
   fontSize: 14,
@@ -271,7 +307,7 @@ const filterBtnSx = {
 
 const dateInputSx = {
   border: "1px solid #cfc6b0",
-  bgcolor: "#f3f0ea",
+  bgcolor: "#f3f0ea", // will override below for theme-based in component
   borderRadius: "20px",
   px: 2.5,
   py: 0.5,
@@ -281,7 +317,8 @@ const dateInputSx = {
 
 const thSx = {
   fontWeight: "bold",
-  borderBottom: "2px solid #e0d7c6",
+  borderBottom: "2px solid",
+  borderColor: "divider",
   py: 2,
 };
 

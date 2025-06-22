@@ -7,6 +7,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  useTheme,
 } from "@mui/material";
 import DonutChart from "./SentimentChart";
 import { ReviewAnalysis } from "../types";
@@ -19,6 +20,7 @@ interface DataCardProps {
 }
 
 const DataCard: React.FC<DataCardProps> = ({ title, initialReviews }) => {
+  const theme = useTheme();
   // Default timePeriod is 'week' -> filter reviews from the past 7 days by default
   const [timePeriod, setTimePeriod] = useState<"week" | "month" | "year">("week");
   const [filteredReviews, setFilteredReviews] = useState<ReviewAnalysis[]>([]);
@@ -56,6 +58,8 @@ const DataCard: React.FC<DataCardProps> = ({ title, initialReviews }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        bgcolor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
       }}
     >
       <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
@@ -72,6 +76,7 @@ const DataCard: React.FC<DataCardProps> = ({ title, initialReviews }) => {
           sx={{
             fontSize: 13,
             fontWeight: 500,
+            color: theme.palette.text.primary,
             "& .MuiSelect-select": {
               display: "flex",
               justifyContent: "center",
@@ -80,6 +85,7 @@ const DataCard: React.FC<DataCardProps> = ({ title, initialReviews }) => {
             },
             "& .MuiSvgIcon-root": {
               fontSize: 22,
+              color: theme.palette.text.primary,
             },
           }}
         >

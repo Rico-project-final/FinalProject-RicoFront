@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useLanguage } from "../context/language/LanguageContext";
 import DataCard from "../components/dataCard";
 import CommentsColumn from "../components/commentsColumn";
@@ -9,7 +10,10 @@ import { CircularProgress } from "@mui/material";
 
 
 export const DataAnalysisPage: React.FC = () => {
-  const [reviewsAnalasys, setReviewsAnalasys] = useState<ReviewAnalysis[]>([]);
+  const theme = useTheme();
+  const { lang, t } = useLanguage();
+
+  const [reviewsAnalasys, setReviewsAnalasys] = useState<ReviewAnalysis[]>();
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,56 +56,70 @@ export const DataAnalysisPage: React.FC = () => {
         flexDirection: "column",
         height: "100vh",
         overflowY: "auto",
-        bgcolor: "#e7e1d2",
+        bgcolor: theme.palette.background.default,
         // direction: lang === "he" ? "rtl" : "ltr",
       }}
     >
       <Box component="main" sx={{ flex: 1, p: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
+        {/* Title */}
+        <Typography
+          variant="h4"
+          sx={{ mb: 3, color: theme.palette.text.primary }}
+        >
           {t("dataAnalysis")}
         </Typography>
 
         {error && (
-          <Typography color="error" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            color="error"
+            sx={{ mb: 2, fontWeight: "bold" }}
+          >
             {error}
           </Typography>
         )}
 
-        
-          {/* Chart Data Cards */}
-          <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-            <DataCard
-              title={t("experience")}
-              reviews={reviewsAnalasys.filter((r) => r.category === "overall")}
-            />
-            <DataCard
-              title={t("service")}
-              reviews={reviewsAnalasys.filter((r) => r.category === "service")}
-            />
-            <DataCard
-              title={t("food")}
-              reviews={reviewsAnalasys.filter((r) => r.category === "food")}
-            />
-          </Box>
+        {/* Chart Data Cards */}
+        <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
+          <DataCard
+            title="experience"
+            initialReviews={(reviewsAnalasys ?? []).filter(
+              (r) => r.category === "overall experience"
+            )}
+          />
+          <DataCard
+            title="service"
+            initialReviews={(reviewsAnalasys ?? []).filter(
+              (r) => r.category === "service"
+            )}
+          />
+          <DataCard
+            title="food"
+            initialReviews={(reviewsAnalasys ?? []).filter(
+              (r) => r.category === "food"
+            )}
+          />
+        </Box>
 
-          {/* Comments Section */}
-          <Box sx={{ display: "flex", gap: 3 }}>
-            <CommentsColumn
-              type="positive"
-              comments={reviewsAnalasys.filter((item) => item.sentiment === "positive")}
-            />
-            <CommentsColumn
-              type="negative"
-              comments={reviewsAnalasys.filter((item) => item.sentiment === "negative")}
-            />
-          </Box>
+        {/* Comments Section */}
+        <Box sx={{ display: "flex", gap: 3 }}>
+          {/* Positive Comments */}
+          <CommentsColumn
+            type="positive"
+            comments={
+              reviewsAnalasys?.filter((item) => item.sentiment === "positive") ||
+              []
+            }
+          />
 
-          {isLoadingMore && (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <CircularProgress />
-          </Box>
-        )}
-        
+          {/* Negative Comments */}
+          <CommentsColumn
+            type="negative"
+            comments={
+              reviewsAnalasys?.filter((item) => item.sentiment === "negative") ||
+              []
+            }
+          />
+        </Box>
       </Box>
     </Box>
   );

@@ -6,7 +6,7 @@ import { DataAnalysisPage } from '../pages/DataAnalysisPage';
 import { ImprovementSuggestionsPage } from '../pages/ImprovementSuggestionsPage';
 import { ClientsPage } from '../pages/ClientsPage';
 import { ToDoPage } from '../pages/ToDoPage';
-import  AdminLayout  from '../layouts/AdminLayout'; // ✅ make sure this path is correct
+import  AdminLayout  from '../layouts/AdminLayout'; 
 import LoginPage from '../pages/AccessDeniedPage';
 import { useAuth } from '../context/auth-context';
 import LandingPage from '../pages/LandingPage';
@@ -14,6 +14,8 @@ import GreetingPage from '../pages/GreetingPage';
 import BusinessRegistrationPage from '../pages/BusinessRegistration';
 import CustomerProfilePage from '../pages/CustomerProfilePage';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
+
+
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
@@ -30,11 +32,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   }
   return <>{children}</>;
 };
-interface AppRoutesProps {
-  handleToggle: () => void;
-  isDarkMode: boolean;
-}
-const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
+const AppRoutes: React.FC = () => {
+
   return (
     <Routes>
       <Route path="/" element={<BusinessRegistrationPage />}/>
@@ -45,7 +44,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
       <Route path="/GreetingPage" element={<GreetingPage />}/>
       <Route path="/dashboard" element={
         <PrivateRoute>
-           <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+           <AdminLayout>
               <Dashboard />
             </AdminLayout>
         </PrivateRoute>
@@ -53,35 +52,35 @@ const AppRoutes: React.FC<AppRoutesProps> = ({handleToggle, isDarkMode }) => {
       
       <Route path="/reviews" element={
         <PrivateRoute>
-            <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+            <AdminLayout>
                 <CommentsPage />
             </AdminLayout>
         </PrivateRoute>
         } />
       <Route path="/data-analysis" element={
         <PrivateRoute>
-            <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+            <AdminLayout>
                  <DataAnalysisPage />
             </AdminLayout>
         </PrivateRoute>
         } />
       <Route path="/optimization" element={
           <PrivateRoute>
-           <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+           <AdminLayout>
                   <ImprovementSuggestionsPage />
             </AdminLayout>
           </PrivateRoute>
         } />
       <Route path="/customers" element={
         <PrivateRoute>
-              <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+              <AdminLayout>
                   <ClientsPage />
               </AdminLayout>
         </PrivateRoute>
         }/>
       <Route path="/todo" element={
         <PrivateRoute>
-              <AdminLayout handleToggle={handleToggle} isDarkMode={isDarkMode}>
+              <AdminLayout>
                   <ToDoPage />
               </AdminLayout>
         </PrivateRoute>

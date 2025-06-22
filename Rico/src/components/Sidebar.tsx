@@ -8,6 +8,7 @@ import {
   ListItemText,
   Typography,
   Divider,
+  useTheme,
 } from '@mui/material';
 import {
   HomeOutlined as HomeIcon,
@@ -22,6 +23,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/auth-context';
 
 const Sidebar: React.FC = () => {
+  const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -39,9 +41,7 @@ const Sidebar: React.FC = () => {
     { id: '/todo', label: 'משימות', icon: <CheckBoxIcon /> },
   ];
 
-  const bottomMenuItems = [
-    { id: '/logout', label: 'התנתק', icon: <LogoutIcon /> },
-  ];
+  const bottomMenuItems = [{ id: '/logout', label: 'התנתק', icon: <LogoutIcon /> }];
 
   const handleItemClick = async (id: string) => {
     setActiveItem(id);
@@ -51,63 +51,81 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const isDark = theme.palette.mode === 'dark';
+
   const MenuItem = ({
     item,
     isActive,
   }: {
     item: { id: string; label: string; icon: React.ReactNode };
     isActive: boolean;
-  }) => (
-    <ListItem disablePadding>
-      <ListItemButton
-        component={item.id === '/logout' ? 'button' : Link}
-        to={item.id !== '/logout' ? item.id : undefined}
-        onClick={() => handleItemClick(item.id)}
-        selected={isActive}
-        sx={{
-          borderRadius: 2,
-          mb: 0.5,
-          color: '#222',
-          backgroundColor: isActive ? '#f3f1e7' : 'transparent',
-          '&:hover': {
-            backgroundColor: '#f3f1e7',
-          },
-          '&.Mui-selected': {
-            backgroundColor: '#f3f1e7',
-            color: '#222',
+  }) => {
+    // Colors based on theme and active state
+    const activeBgColor = isDark ? theme.palette.primary.dark : '#f3f1e7';
+    const hoverBgColor = isDark ? theme.palette.primary.main : '#ece8d9';
+    const textColor = isActive
+      ? isDark
+        ? theme.palette.primary.contrastText
+        : '#222'
+      : isDark
+      ? theme.palette.text.primary
+      : '#222';
+    const iconColor = textColor;
+
+    return (
+      <ListItem disablePadding>
+        <ListItemButton
+          component={item.id === '/logout' ? 'button' : Link}
+          to={item.id !== '/logout' ? item.id : undefined}
+          onClick={() => handleItemClick(item.id)}
+          selected={isActive}
+          sx={{
+            borderRadius: 2,
+            mb: 0.5,
+            color: textColor,
+            backgroundColor: isActive ? activeBgColor : 'transparent',
             '&:hover': {
-              backgroundColor: '#ece8d9',
+              backgroundColor: isActive ? hoverBgColor : isDark ? theme.palette.action.hover : '#f3f1e7',
             },
-          },
-          minHeight: 44,
-          pl: 2,
-          pr: 2,
-        }}
-      >
-        <ListItemIcon sx={{ minWidth: 36, color: '#222' }}>{item.icon}</ListItemIcon>
-        <ListItemText
-          primary={item.label}
-          primaryTypographyProps={{
-            fontSize: 15,
-            fontWeight: isActive ? 600 : 400,
-            fontFamily: 'inherit',
+            '&.Mui-selected': {
+              backgroundColor: activeBgColor,
+              color: textColor,
+              '&:hover': {
+                backgroundColor: hoverBgColor,
+              },
+            },
+            minHeight: 44,
+            pl: 2,
+            pr: 2,
           }}
-        />
-      </ListItemButton>
-    </ListItem>
-  );
+        >
+          <ListItemIcon sx={{ minWidth: 36, color: iconColor }}>{item.icon}</ListItemIcon>
+          <ListItemText
+            primary={item.label}
+            primaryTypographyProps={{
+              fontSize: 15,
+              fontWeight: isActive ? 600 : 400,
+              fontFamily: 'inherit',
+              color: textColor,
+            }}
+          />
+        </ListItemButton>
+      </ListItem>
+    );
+  };
 
   return (
     <Box
       sx={{
         width: 240,
-        backgroundColor: '#fff',
-        borderRight: '1px solid #f3f1e7',
-        minHeight: '100%',
+        backgroundColor: isDark ? theme.palette.background.paper : '#fff',
+        borderRight: `1px solid ${isDark ? theme.palette.divider : '#f3f1e7'}`,
+        minHeight: '100vh',
         py: 2,
         px: 1,
         display: 'flex',
         flexDirection: 'column',
+        color: isDark ? theme.palette.text.primary : undefined,
       }}
     >
       <List>
@@ -116,13 +134,13 @@ const Sidebar: React.FC = () => {
         ))}
       </List>
 
-      <Divider sx={{ my: 2, background: '#f3f1e7' }} />
+      <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
       <Typography
         variant="caption"
         sx={{
           px: 2,
           py: 1,
-          color: '#888',
+          color: isDark ? theme.palette.text.secondary : '#888',
           fontWeight: 500,
           letterSpacing: 1,
         }}
@@ -136,7 +154,7 @@ const Sidebar: React.FC = () => {
       </List>
 
       <Box sx={{ flexGrow: 1 }} />
-      <Divider sx={{ my: 2, background: '#f3f1e7' }} />
+      <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
       <List>
         {bottomMenuItems.map((item) => (
           <MenuItem key={item.id} item={item} isActive={activeItem === item.id} />
