@@ -14,7 +14,6 @@ import {
   Link,
   Snackbar,
   Alert as MuiAlert,
-  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -32,7 +31,6 @@ const Alert = MuiAlert as React.FC<
 >;
 
 const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
-  const theme = useTheme();
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -96,9 +94,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
     setIsRegisterMode((prev) => !prev);
   };
 
-  // Dark mode conditional styles
-  const isDark = theme.palette.mode === 'dark';
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogContent
@@ -106,14 +101,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
           fontFamily: `'Varela Round', 'Baloo', 'Rubik', Arial, sans-serif`,
           padding: 4,
           position: 'relative',
-          backgroundColor: isDark ? theme.palette.background.default : '#f2f0de',
-          color: isDark ? theme.palette.text.primary : 'black',
+          backgroundColor: '#f2f0de',
         }}
       >
         <IconButton
           onClick={onClose}
-          sx={{ position: 'absolute', top: 12, right: 12, color: isDark ? theme.palette.text.primary : 'black' }}
-          aria-label="close"
+          sx={{ position: 'absolute', top: 12, right: 12 }}
         >
           <CloseIcon />
         </IconButton>
@@ -126,7 +119,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             width: { xs: '90px', sm: '120px' },
             margin: '10px auto 16px auto',
             display: 'block',
-            filter: isDark ? 'brightness(0) invert(1)' : 'none', // invert logo color for dark mode if needed
           }}
         />
 
@@ -136,7 +128,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             fontSize: { xs: '2rem', sm: '2.5rem' },
             mb: 3,
             textAlign: 'center',
-            color: isDark ? theme.palette.text.primary : 'black',
+            color: 'black',
           }}
         >
           {isRegisterMode ? t('register') : t('login')}
@@ -151,14 +143,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
                 fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                sx={{
-                  backgroundColor: isDark ? theme.palette.background.paper : 'white',
-                  borderRadius: 1,
-                  input: { color: isDark ? theme.palette.text.primary : 'black' },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: isDark ? theme.palette.divider : undefined,
-                  },
-                }}
+                sx={{ backgroundColor: 'white', borderRadius: 1 }}
               />
               <TextField
                 label={t('phone')}
@@ -166,14 +151,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
                 fullWidth
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                sx={{
-                  backgroundColor: isDark ? theme.palette.background.paper : 'white',
-                  borderRadius: 1,
-                  input: { color: isDark ? theme.palette.text.primary : 'black' },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: isDark ? theme.palette.divider : undefined,
-                  },
-                }}
+                sx={{ backgroundColor: 'white', borderRadius: 1 }}
               />
             </>
           )}
@@ -183,14 +161,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{
-              backgroundColor: isDark ? theme.palette.background.paper : 'white',
-              borderRadius: 1,
-              input: { color: isDark ? theme.palette.text.primary : 'black' },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? theme.palette.divider : undefined,
-              },
-            }}
+            sx={{ backgroundColor: 'white', borderRadius: 1 }}
           />
           <TextField
             label={t('password')}
@@ -199,30 +170,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{
-              backgroundColor: isDark ? theme.palette.background.paper : 'white',
-              borderRadius: 1,
-              input: { color: isDark ? theme.palette.text.primary : 'black' },
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? theme.palette.divider : undefined,
-              },
-            }}
+            sx={{ backgroundColor: 'white', borderRadius: 1 }}
           />
           <Button
             disabled={isLoading}
             onClick={isRegisterMode ? handleRegister : handleEmailLogin}
             sx={{
-              background: isDark ? theme.palette.primary.main : '#fff',
+              background: '#fff',
               borderRadius: '1rem',
               padding: '0.75rem',
               fontSize: '1rem',
-              boxShadow: isDark
-                ? `0 2px 8px ${theme.palette.primary.dark}`
-                : '0 2px 8px rgba(0, 0, 0, 0.15)',
-              color: isDark ? theme.palette.primary.contrastText : 'black',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              color: 'black',
               textTransform: 'none',
               '&:hover': {
-                background: isDark ? theme.palette.primary.dark : '#eee',
+                background: '#eee',
               },
             }}
           >
@@ -245,9 +207,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
             <Typography
               sx={{
                 mt: 2,
-                color: theme.palette.error.main,
+                color: 'red',
                 fontSize: '1rem',
-                textAlign: 'center',
               }}
             >
               {error}
@@ -268,32 +229,27 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
               onClick={switchMode}
               sx={{
                 ml: 1,
-                background: isDark ? theme.palette.background.paper : '#fff',
+                background: '#fff',
                 borderRadius: '1rem',
                 padding: '0.75rem',
                 fontSize: '1rem',
-                boxShadow: isDark
-                  ? `0 2px 8px ${theme.palette.background.paper}`
-                  : '0 2px 8px rgba(0, 0, 0, 0.15)',
-                color: isDark ? theme.palette.primary.main : 'black',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                color: 'black',
                 textTransform: 'none',
                 '&:hover': {
-                  background: isDark ? theme.palette.action.hover : '#eee',
+                  background: '#eee',
                 },
               }}
             >
               {isRegisterMode ? t('login') : t('register')}
             </Link>
-            <Typography
-              variant="body2"
-              sx={{ color: isDark ? theme.palette.text.primary : 'inherit' }}
-            >
+            <Typography variant="body2">
               {isRegisterMode ? t('alreadyHaveAccount') : t('noAccount')}
             </Typography>
           </Box>
         </Box>
 
-        {/* Snackbar */}
+        {/* ✅ Snackbar component */}
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}
