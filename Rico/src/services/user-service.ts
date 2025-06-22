@@ -3,8 +3,11 @@ import { User, Review } from '../types';
 
 export { CanceledError };
 
-export const getAllUsers = () => {
-  return apiClient.get<User[]>('/users/getAll');
+//get all users (admin only) - pagination
+export const getAllUsers = (page = 1, limit = 10) => {
+  return apiClient.get<{ users: User[]; pagination: any }>(
+    `/users/getAll?page=${page}&limit=${limit}`
+  );
 };
 
 export const getUserById = (userId: string) => {

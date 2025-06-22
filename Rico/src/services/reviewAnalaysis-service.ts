@@ -3,9 +3,11 @@ import { ReviewAnalysis } from '../types';
 
 export { CanceledError };
 
-// GET /analysis/getAll (admin only)
-export const getAllReviewAnalyses = () => {
-  return apiClient.get<ReviewAnalysis[]>('/analysis/getAll');
+// GET /analysis/getAll (admin only) - pagination
+export const getAllReviewAnalyses = (page = 1, limit = 10) => {
+  return apiClient.get<{ reviews: ReviewAnalysis[]; pagination: any }>(
+    `/analysis/getAll?page=${page}&limit=${limit}`
+  );
 };
 
 // GET /analysis/:reviewId (admin only)

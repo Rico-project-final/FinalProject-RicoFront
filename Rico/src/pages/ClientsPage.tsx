@@ -10,6 +10,7 @@ import {
   Paper,
   IconButton,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import { useLanguage } from "../context/language/LanguageContext";
@@ -25,12 +26,32 @@ export const ClientsPage: React.FC = () => {
   const [selectedEmail, setSelectedEmail] = useState("");
   const [selectedText, setSelectedText] = useState("");
 
-  const fetchAllUsers = async () => {
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const fetchAllUsers = async (currentPage: number) => {
     try {
-      const response = await getAllUsers();
-      setUsers(response.data);
+      const response = await getAllUsers(currentPage, 15);
+      setUsers((prev) => [...prev, ...response.data.users]);
+      setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching users:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUsers(page);
+  }, [page]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+    if (nearBottom && !isLoadingMore && page < totalPages) {
+      setIsLoadingMore(true);
+      setPage((prev) => prev + 1);
     }
   };
 
@@ -42,19 +63,18 @@ export const ClientsPage: React.FC = () => {
 
   const filteredClients = users.filter((c) =>
     [c.name, c.email, c._id, c.phone ?? ""].some((field) =>
-      field?.includes(search)
+      field?.toLowerCase().includes(search.toLowerCase())
     )
   );
 
-  useEffect(() => {
-    fetchAllUsers();
-  }, []);
-
   return (
     <Box
+      onScroll={handleScroll}
       sx={{
         display: "flex",
-        minHeight: "100vh",
+        flexDirection: "column",
+        height: "100vh",
+        overflowY: "auto",
         bgcolor: "#e7e1d2",
         direction: lang === "he" ? "rtl" : "ltr",
       }}
@@ -78,36 +98,22 @@ export const ClientsPage: React.FC = () => {
             overflow: "hidden",
           }}
         >
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow sx={{ bgcolor: "#f5f2e7" }}>
-                <TableCell sx={headCellSx} align="center">
-                  {t("id")}
-                </TableCell>
-                <TableCell sx={headCellSx} align="center">
-                  {t("email")}
-                </TableCell>
-                <TableCell sx={headCellSx} align="center">
-                  {t("name")}
-                </TableCell>
-                <TableCell sx={headCellSx} align="center">
-                  {t("contact")}
-                </TableCell>
+                <TableCell sx={headCellSx} align="center">{t("id")}</TableCell>
+                <TableCell sx={headCellSx} align="center">{t("email")}</TableCell>
+                <TableCell sx={headCellSx} align="center">{t("name")}</TableCell>
+                <TableCell sx={headCellSx} align="center">{t("contact")}</TableCell>
                 <TableCell sx={headCellSx} align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredClients.map((c) => (
-                <TableRow key={c._id} sx={{ textAlign: "center" }}>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {c._id.slice(-6)}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {c.email}
-                  </TableCell>
-                  <TableCell sx={bodyCellSx} align="center">
-                    {c.name}
-                  </TableCell>
+                <TableRow key={c._id}>
+                  <TableCell sx={bodyCellSx} align="center">{c._id.slice(-6)}</TableCell>
+                  <TableCell sx={bodyCellSx} align="center">{c.email}</TableCell>
+                  <TableCell sx={bodyCellSx} align="center">{c.name}</TableCell>
                   <TableCell sx={[bodyCellSx, { position: "relative" }]} align="center">
                     <IconButton
                       onClick={() => handleContact(c.email, `Hi ${c.name},`)}
@@ -118,6 +124,13 @@ export const ClientsPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ))}
+              {isLoadingMore && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 2 }}>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

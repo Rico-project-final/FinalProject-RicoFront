@@ -30,7 +30,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ reviews }) => {
   // if (total === 0) return <Typography textAlign="center">אין נתונים</Typography>;
 
   return (
-    <Box sx={{ width: "100%", height: 200 }} dir="rtl">
+    <Box sx={{ width: "100%", height: 200 }}
+     dir="rtl"
+     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

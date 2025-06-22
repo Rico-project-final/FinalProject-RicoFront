@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Dashboard } from '../pages/Dashboard';
-import { CommentsPage } from '../pages/comment';
+import { CommentsPage } from '../pages/CommentsPage';
 import { DataAnalysisPage } from '../pages/DataAnalysisPage';
 import { ImprovementSuggestionsPage } from '../pages/ImprovementSuggestionsPage';
 import { ClientsPage } from '../pages/ClientsPage';

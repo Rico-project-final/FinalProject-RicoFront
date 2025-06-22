@@ -15,9 +15,11 @@ export const createReview = (data: {
   return apiClient.post<Review>('/reviews/create', data);
 };
 
-// GET /reviews/getAll (admin only)
-export const getAllReviews = () => {
-  return apiClient.get<Review[]>('/reviews/getAll');
+// GET /reviews/getAll (admin only) - pagination
+export const getAllReviews = (page = 1, limit = 10) => {
+  return apiClient.get<{ reviews: Review[]; pagination: any }>(
+    `/reviews/getAll?page=${page}&limit=${limit}`
+  );
 };
 
 // GET /reviews/:reviewId (admin only)

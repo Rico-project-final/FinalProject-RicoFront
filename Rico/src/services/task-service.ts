@@ -5,9 +5,11 @@ export { CanceledError };
 
 
 
-// GET all tasks (admin-only)
-export const getAllTasks = () => {
-  return apiClient.get<Task[]>('/tasks');
+// GET all tasks (admin-only) - pagination
+export const getAllTasks = (page = 1, limit = 10) => {
+  return apiClient.get<{ tasks: Task[]; pagination: any }>(
+    `/tasks?page=${page}&limit=${limit}`
+  );
 };
 
 // GET a specific task by ID
