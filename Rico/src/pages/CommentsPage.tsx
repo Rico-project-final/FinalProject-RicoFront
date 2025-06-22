@@ -52,7 +52,6 @@ export const CommentsPage: React.FC = () => {
     try {
       const response = await getAllReviews(currentPage, 15);
       setAllReviews((prev) => [...prev, ...response.data.reviews]);
-      console.log("Fetched reviews:", response.data.reviews);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Failed to fetch reviews:", error);

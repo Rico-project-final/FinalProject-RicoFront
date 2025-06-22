@@ -25,7 +25,7 @@ import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats } from "../services/user-service";
 import { Review, ReviewAnalysis } from "../types";
 import CommentModal from "../components/commentModal";
-import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
+import { getAllReviewAnalysesNoPage } from "../services/reviewAnalaysis-service";
 import GoogleMapSearch from "../components/GoogleMapSearch";
 import GoogleIcon from "@mui/icons-material/Google";
 import { generateBusinessQr} from '../services/business-service';
@@ -214,7 +214,7 @@ export const Dashboard: React.FC = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await getAllReviewAnalyses();
+      const response = await getAllReviewAnalysesNoPage();
       const chart = transformReviewsToChartData(response.data);
       setReviewChartData(chart);
     } catch (error) {

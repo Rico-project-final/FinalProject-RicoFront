@@ -12,15 +12,11 @@ import { CircularProgress } from "@mui/material";
 export const DataAnalysisPage: React.FC = () => {
   const theme = useTheme();
   const { lang, t } = useLanguage();
-
   const [reviewsAnalasys, setReviewsAnalasys] = useState<ReviewAnalysis[]>();
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const { lang, t } = useLanguage();
-
   const fetchReviewsAnalysis = async (currentPage: number) => {
     try {
       const response = await getAllReviewAnalyses(currentPage, 10);

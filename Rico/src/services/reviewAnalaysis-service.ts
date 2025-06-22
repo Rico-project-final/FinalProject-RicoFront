@@ -9,6 +9,10 @@ export const getAllReviewAnalyses = (page = 1, limit = 10) => {
     `/analysis/getAll?page=${page}&limit=${limit}`
   );
 };
+// GET /analysis/getAll (admin only)
+export const getAllReviewAnalysesNoPage = () => {
+  return apiClient.get<ReviewAnalysis[]>('/analysis/getAllNoPage');
+};
 
 // GET /analysis/:reviewId (admin only)
 export const getReviewAnalysisById = (reviewId: string) => {
