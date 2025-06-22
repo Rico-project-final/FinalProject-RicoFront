@@ -21,6 +21,7 @@ import { getDashboardStats } from "../services/user-service";
 import { generateBusinessQr } from "../services/business-service";
 import { Review } from "../types";
 import CommentModal from "../components/commentModal";
+import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
 
 export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Array<{
@@ -55,25 +56,16 @@ export const Dashboard: React.FC = () => {
 
   const [totalStats, setTotalStats] = useState({ totalReviews: 0, totalClients: 0, totalTasks: 0 });
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<any>();
+  const [reviewChartData, setReviewChartData] = useState<any[]>([]);
   const [qrImage, setQrImage] = useState<string | null>(null);
-  const [selectedComment, setSelectedComment] = useState<string | null>(null);
-  const [selectedClientName, setSelectedClientName] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date | string>(new Date());
-  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
-  const { lang, t } = useLanguage();
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchDashboardData = async () => {
-    try {
-      const response = await getDashboardStats();
-      setTotalStats(response.data);
-      setReviews(response.data.lastWeekReviews);
-      setChartData(response.data.chartData);
-    } catch (e: any) {
-      setError("error while loading data");
-    }
-  };
+  const [selectedComment, setSelectedComment] = useState<string>("");
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string | Date>(new Date());
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+
+  const { lang, t } = useLanguage();
 
   const handleGenerateQR = async () => {
     try {
@@ -85,14 +77,59 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleOpenModal = (comment: string, clientName: string, date: string | Date) => {
-  setSelectedComment(comment);
-  setSelectedClientName(clientName);
-  setSelectedDate(date);
-  setIsCommentModalOpen(true);
+    setSelectedComment(comment);
+    setSelectedClientName(clientName);
+    setSelectedDate(date);
+    setIsCommentModalOpen(true);
+  };
+
+  const transformReviewsToChartData = (reviews: ReviewAnalysis[]) => {
+    const months = Array.from({ length: 12 }, (_, i) =>
+      new Date(0, i).toLocaleString("default", { month: "short" })
+    );
+
+    const initialData = months.map((month) => ({
+      name: month,
+      food: 0,
+      service: 0,
+      experience: 0,
+    }));
+
+    reviews.forEach((review) => {
+      const monthIndex = new Date(review.createdAt).getMonth();
+      const categoryKey =
+        review.category === "overall experience" ? "experience" : review.category;
+
+      (initialData[monthIndex] as any)[categoryKey]++;
+    });
+
+    return initialData;
   };
 
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getDashboardStats();
+        setTotalStats(response.data);
+        setReviews(response.data.lastWeekReviews);
+      } catch (e: any) {
+        setError("error while loading data");
+      }
+    };
+
+    const fetchReviews = async () => {
+      try {
+        const response = await getAllReviewAnalyses();
+        const chart = transformReviewsToChartData(response.data);
+        setReviewChartData(chart);
+      } catch (error) {
+        console.error("Failed to fetch review analyses:", error);
+        setError("Failed to fetch review analyses");
+      }
+    };
+
     fetchDashboardData();
+    fetchReviews();
   }, []);
 
   if (error) return <Typography color="error">{error}</Typography>;
@@ -113,7 +150,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-          {stats.map((stat, index) => (
+          {stats.map((stat) => (
             <Paper
               key={stat.label}
               sx={{
@@ -149,33 +186,26 @@ export const Dashboard: React.FC = () => {
               backgroundColor: "#fff",
             }}
           >
-            <Typography
-              sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}
-            >
+            <Typography sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2 }}>
               {t("reviewsAddedThisWeek")}
             </Typography>
-            {/* TODO :: Add pagination - only 5 comments */}
             {reviews.map((c, i) => (
-            <Box key={i} sx={{ mb: 2 }}>
-              <Typography
-                sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
-                onClick={() =>
-                handleOpenModal(c.text, (c.userId as { name: string }).name, c.createdAt)}>
-                {c.text}
-              </Typography>
-
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <Button variant="outlined" sx={commentButtonSx}>
-                  {t("viewReview")}
-                </Button>
-                <Button variant="outlined" sx={commentButtonSx}>
-                  {t("suggestTreatment")}
-                </Button>
+              <Box key={i} sx={{ mb: 2 }}>
+                <Typography
+                  sx={{ mb: 1, cursor: "pointer", fontSize: 14 }}
+                  onClick={() =>
+                    handleOpenModal(
+                      c.text,
+                      (c.userId as { name: string }).name,
+                      c.createdAt
+                    )
+                  }
+                >
+                  {c.text}
+                </Typography>
+                {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
               </Box>
-
-              {i < reviews.length - 1 && <Divider sx={{ mt: 2 }} />}
-            </Box>
-          ))}
+            ))}
           </Paper>
 
           {/* Chart */}
@@ -204,14 +234,14 @@ export const Dashboard: React.FC = () => {
             </Box>
 
             <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={chartData}>
+              <LineChart data={reviewChartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey={t("food")} stroke="#6b7cff" />
-                <Line type="monotone" dataKey={t("service")} stroke="#e17cff" />
-                <Line type="monotone" dataKey={t("experience")} stroke="#ff7c7c" />
+                <Line type="monotone" dataKey="food" stroke="#6b7cff" />
+                <Line type="monotone" dataKey="service" stroke="#e17cff" />
+                <Line type="monotone" dataKey="experience" stroke="#ff7c7c" />
               </LineChart>
             </ResponsiveContainer>
           </Paper>
@@ -231,11 +261,9 @@ export const Dashboard: React.FC = () => {
           }}
         >
           <Typography sx={{ fontWeight: "bold", fontSize: 20 }}>
-            {/* {t("generateQr")} */}
             generate QR
           </Typography>
           <Button onClick={handleGenerateQR} variant="contained">
-            {/* {t("generateQr")} */}
             generate QR
           </Button>
 
@@ -255,32 +283,21 @@ export const Dashboard: React.FC = () => {
                 }}
                 variant="outlined"
               >
-                {/* {t("downloadQr")}
-                 */}
-                 donwload QR
+                download QR
               </Button>
             </>
           )}
         </Paper>
       </Box>
+
+      {/* Comment Modal */}
       <CommentModal
         open={isCommentModalOpen}
-        comment={selectedComment || ""}
+        comment={selectedComment}
         clientName={selectedClientName}
         commentDate={selectedDate}
         onClose={() => setIsCommentModalOpen(false)}
       />
     </Box>
   );
-};
-
-const commentButtonSx = {
-  border: "1px solid #cfc6b0",
-  backgroundColor: "#f3f0ea",
-  borderRadius: "20px",
-  px: 3,
-  py: 0.75,
-  textTransform: "none",
-  fontWeight: "bold",
-  fontSize: 14,
 };

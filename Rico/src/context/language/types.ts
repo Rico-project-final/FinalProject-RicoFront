@@ -67,12 +67,11 @@ export type TranslationKeys = {
   Analyze:string;
   contact:string;
   priority: string;
-    low:string;
-    high:string;
-    medium:string;
-    delete: string;
-    actions: string;
- 
+  low: string;
+  medium: string;
+  high: string;
+  delete: string;
+  actions: string;
 
 };
 
