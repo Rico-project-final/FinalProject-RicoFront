@@ -5,19 +5,18 @@ import {
   Typography,
   TextField,
   Container,
-  useTheme,
+  ThemeProvider,
 } from "@mui/material";
 import ricoLogo from "../assets/rico-logo.png";
-import { useLanguage } from "../context/language/LanguageContext";
 import LoginModal from "../components/loginModal";
 import { useAuth } from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
+import { lightTheme } from "../theme";
 
 
 const BusinessRegistrationPage: React.FC = () => {
   const [loginOpen, setLoginOpen] = useState(false);
-  const theme = useTheme();
   const navigate = useNavigate();
   const {
     user,
@@ -26,15 +25,13 @@ const BusinessRegistrationPage: React.FC = () => {
     registerBusinessWithGoogle,
     clearError,
   } = useAuth();
-  const { t } = useLanguage();
-
   const [form, setForm] = useState({
-  name: "",
-  email: "",
-  password: "",
-  phone: "",
-  companyName: "",
-});
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
+    companyName: "",
+  });
 
   const [formErrors, setFormErrors] = useState({
     name: "",
@@ -69,50 +66,49 @@ const BusinessRegistrationPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-  clearError();
-  if (!validateForm()) return;
-
-  try {
-    await registerBusiness(
-      form.email,
-      form.password,
-      form.companyName,
-      form.name,
-      form.phone
-    );
-  } catch (err: any) {
-    console.error("Register failed:", err);
-
-    // Check if error message matches
-    const errorMessage = err.response?.data?.message || '';
-    if (err.response?.status === 400 && errorMessage === 'Email already exists') {
-      alert('Email already exists');
-    } else {
-      alert(errorMessage || 'Registration failed');
-    }
-  }
-};
-const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
-  try {
     clearError();
-    const credential = credentialResponse.credential;
-
     if (!validateForm()) return;
 
-    await registerBusinessWithGoogle(
-      credential,
-      form.password,
-      form.companyName,
-      form.phone
-    );
+    try {
+      await registerBusiness(
+        form.email,
+        form.password,
+        form.companyName,
+        form.name,
+        form.phone
+      );
+    } catch (err: any) {
+      console.error("Register failed:", err);
 
-    navigate('/dashboard');
-  } catch (err) {
-    console.error("Google Sign-up failed:", err);
-    alert("Google Sign-up failed");
-  }
-};
+      const errorMessage = err.response?.data?.message || '';
+      if (err.response?.status === 400 && errorMessage === 'Email already exists') {
+        alert('Email already exists');
+      } else {
+        alert(errorMessage || 'Registration failed');
+      }
+    }
+  };
 
+  const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
+    try {
+      clearError();
+      const credential = credentialResponse.credential;
+
+      if (!validateForm()) return;
+
+      await registerBusinessWithGoogle(
+        credential,
+        form.password,
+        form.companyName,
+        form.phone
+      );
+
+      navigate('/dashboard');
+    } catch (err) {
+      console.error("Google Sign-up failed:", err);
+      alert("Google Sign-up failed");
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -125,7 +121,16 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
   }, [user, loginOpen, navigate]);
 
   return (
-    <Box sx={{ fontFamily: "Arial, sans-serif", backgroundColor: theme.palette.background.default }}>
+    <>
+    <ThemeProvider theme={lightTheme}>
+    <Box
+      sx={{
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: lightTheme.palette.background.default,
+        color: lightTheme.palette.text.primary,
+        minHeight: "100vh",
+      }}
+    >
       <Button
         onClick={() => setLoginOpen(true)}
         sx={{
@@ -143,33 +148,64 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
           "&:hover": { background: "#eee" },
         }}
       >
-        {t("login")}
+        התחברות
       </Button>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
-
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.secondary.main,
+          backgroundColor: lightTheme.palette.primary.main,
+          color: lightTheme.palette.text.primary,
           textAlign: "center",
           py: 6,
         }}
       >
-        <Box sx={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", display: "flex" }}>
+        <Box
+          sx={{
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            display: "flex",
+          }}
+        >
           <Box component="img" src={ricoLogo} alt="Rico Logo" sx={{ height: 80, mb: 2 }} />
-          <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>Rico</Typography>
+          <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
+            Rico
+          </Typography>
         </Box>
         <Typography variant="h5">your AI helper for your business</Typography>
-        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, flexWrap: "wrap", mt: 3 }}>
-          <Button sx={buttonsSxProp} variant="outlined" color="secondary" href="#services">
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+            mt: 3,
+          }}
+        >
+          <Button
+            sx={buttonsSxProp}
+            variant="outlined"
+            color="secondary"
+            href="#services"
+          >
             About our services
           </Button>
-          <Button sx={buttonsSxProp} variant="outlined" color="secondary" href="#register">
+          <Button
+            sx={buttonsSxProp}
+            variant="outlined"
+            color="secondary"
+            href="#register"
+          >
             Register your business
           </Button>
-          <Button sx={buttonsSxProp} variant="outlined" color="secondary" href="#benefits">
+          <Button
+            sx={buttonsSxProp}
+            variant="outlined"
+            color="secondary"
+            href="#benefits"
+          >
             Benefits from RICO
           </Button>
         </Box>
@@ -178,7 +214,9 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
       {/* Services Section */}
       <Box id="services" sx={{ py: 6, px: 3 }}>
         <Container maxWidth="md">
-          <Typography variant="h4" gutterBottom color="secondary">About Our Services</Typography>
+          <Typography variant="h4" gutterBottom color="text.primary">
+            About Our Services
+          </Typography>
           <Typography variant="body1" color="text.primary">
             Rico helps businesses analyze customer feedback using advanced AI to uncover key insights, improve service, and make better decisions.
           </Typography>
@@ -186,11 +224,26 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
       </Box>
 
       {/* Register Section */}
-      <Box id="register" sx={{ py: 6, px: 3, backgroundColor: theme.palette.mode === "dark" ? "#1e1e1e" : "#e8eef4" }}>
+      <Box
+        id="register"
+        sx={{
+          py: 6,
+          px: 3,
+          backgroundColor: lightTheme.palette.background.default,
+          color: lightTheme.palette.text.primary,
+        }}
+      >
         <Container maxWidth="md">
-          <Typography variant="h4" gutterBottom color="secondary">Get started with Rico’s services</Typography>
-          <Typography variant="body2" gutterBottom color="text.secondary">Fill out the form below to register your business</Typography>
-          <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+          <Typography variant="h4" gutterBottom color="text.primary">
+            Get started with Rico’s services
+          </Typography>
+          <Typography variant="body2" gutterBottom color="text.secondary">
+            Fill out the form below to register your business
+          </Typography>
+          <Box
+            component="form"
+            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+          >
             <TextField
               name="name"
               label="Name"
@@ -243,25 +296,33 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
               error={!!formErrors.companyName}
               helperText={formErrors.companyName}
             />
-            
-            <Box sx={{ mt: 3, alignSelf: "center" , display:"flex",alignItems:"center", justifyContent: "center",  gap: 2 }}>
-              <Button
-              onClick={handleSubmit}
-              variant="contained"
-              color="secondary"
-              sx={[buttonsSxProp, { alignSelf: "center" }]}
-              disabled={isLoading}
+
+            <Box
+              sx={{
+                mt: 3,
+                alignSelf: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
             >
-              Register Now
-            </Button>
+              <Button
+                onClick={handleSubmit}
+                variant="contained"
+                color="secondary"
+                sx={[buttonsSxProp, { alignSelf: "center" }]}
+                disabled={isLoading}
+              >
+                Register Now
+              </Button>
 
-            <GoogleLogin
-              onSuccess={handleGoogleSignUpSuccess}
-              onError={() => alert("Google Sign-Up failed")}
-              useOneTap={false}
-            />
-          </Box>
-
+              <GoogleLogin
+                onSuccess={handleGoogleSignUpSuccess}
+                onError={() => alert("Google Sign-Up failed")}
+                useOneTap={false}
+              />
+            </Box>
           </Box>
         </Container>
       </Box>
@@ -269,7 +330,7 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
       {/* Benefits Section */}
       <Box id="benefits" sx={{ py: 6, px: 3 }}>
         <Container maxWidth="md">
-          <Typography variant="h4" gutterBottom color="secondary">
+          <Typography variant="h4" gutterBottom color="text.primary">
             What Can You Benefit from RICO
           </Typography>
           <Typography variant="body1" color="text.primary" sx={{ mb: 2 }}>
@@ -284,6 +345,8 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
         </Container>
       </Box>
     </Box>
+    </ThemeProvider>
+    </>
   );
 };
 

@@ -5,6 +5,9 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/auth-context";
 import { useCustomTheme, CustomThemeProvider } from "./context/ThemeContext";
 import AppRoutes from "./routes/appRoutes";
+import { LoadScript } from "@react-google-maps/api"; 
+
+const libraries: ("places")[] = ["places"]; 
 
 function AppWrapper() {
   return (
@@ -26,9 +29,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router>
-          <AppRoutes/>
-        </Router>
+        <LoadScript 
+          googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+          libraries={libraries}
+        >
+          <Router>
+            <AppRoutes />
+          </Router>
+        </LoadScript>
       </AuthProvider>
     </ThemeProvider>
   );

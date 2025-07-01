@@ -51,7 +51,12 @@ export const CommentsPage: React.FC = () => {
   const fetchReviews = async (currentPage: number) => {
     try {
       const response = await getAllReviews(currentPage, 15);
-      setAllReviews((prev) => [...prev, ...response.data.reviews]);
+      setAllReviews((prev) => {
+          const newReviews = response.data.reviews.filter(
+            (r) => !prev.some((existing) => existing._id === r._id)
+          );
+          return [...prev, ...newReviews];
+        });
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Failed to fetch reviews:", error);
@@ -136,7 +141,7 @@ useEffect(() => {
           }}
         >
           <InputBase
-            placeholder={t("clientName")}
+            placeholder="שם לקוח"
             value={nameFilter}
             onChange={(e) => setNameFilter(e.target.value)}
             sx={{
@@ -174,7 +179,7 @@ useEffect(() => {
               color: theme.palette.text.primary,
             }}
           >
-            {t("filter")}
+            סנן
           </Button>
           <Button
             variant="outlined"
@@ -187,14 +192,14 @@ useEffect(() => {
               mr: lang === "he" ? 0 : "auto",
             }}
           >
-            {t("resetFilter")}
+            איפוס סינון
           </Button>
           <Button
             variant="outlined"
             onClick={handleAllReviewAnalysis}
             sx={{ ...filterBtnSx, color: "green" }}
           >
-            {t("Analyze")}
+            נתן נתונים
           </Button>
         </Box>
 
@@ -218,57 +223,61 @@ useEffect(() => {
                 }}
               >
                 <TableCell sx={thSx} align="center" >
-                  {t("clientName")}
+                  שם הלקוח
                 </TableCell>
                 <TableCell sx={thSx} align="center" >
-                  {t("date")}
+                  תאריך
                 </TableCell>
                 <TableCell sx={thSx} align="center" >
-                  {t("reviewDesc")}
+                  התגובה
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredReviews.map((review) => (
-                <TableRow
-                  key={review._id}
-                  hover
-                  sx={{ cursor: "pointer" }}
-                  onClick={() =>
-                    handleCommentClick(
-                      review.text,
-                      review.userId && typeof review.userId === "object" && "name" in review.userId
-                        ? review.userId.name
-                        : "-",
-                      review.createdAt
-                    )
-                  }
-                >
-                  <TableCell sx={tdSx} align="center" >
-                    {review.userId !== null &&
-                    typeof review.userId === "object" &&
-                    "name" in review.userId
-                      ? review.userId.name
-                      : "-"}
-                  </TableCell>
-                  <TableCell sx={tdSx} align="center" >
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell sx={{ ...tdSx, maxWidth: 300 }} align="center" >
-                    <Box
-                      sx={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "300px",
-                      }}
-                      title={review.text}
-                    >
-                      {review.text}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {filteredReviews.map((review) => {
+                const clientName =
+                  review.source === "user"
+                    ? review.userId?.name || "-"
+                    : review.source === "google"
+                    ? review.authorName || "-"
+                    : "-";
+
+                return (
+                  <TableRow
+                    key={review._id}
+                    hover
+                    sx={{ cursor: "pointer" }}
+                    onClick={() =>
+                      handleCommentClick(
+                        review.text,
+                        clientName,
+                        review.createdAt
+                      )
+                    }
+                  >
+                    <TableCell sx={tdSx} align="center">
+                      {clientName}
+                    </TableCell>
+                    <TableCell sx={tdSx} align="center">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell sx={{ ...tdSx, maxWidth: 300 }} align="center">
+                      <Box
+                        sx={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          maxWidth: "300px",
+                        }}
+                        title={review.text}
+                      >
+                        {review.text}
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
 
               {isLoadingMore && (
                 <TableRow>

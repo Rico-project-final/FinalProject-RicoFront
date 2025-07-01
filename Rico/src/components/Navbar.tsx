@@ -1,3 +1,16 @@
+/**
+ * AppNavbar Component
+ * -------------------
+ * Top navigation bar for the app including:
+ * - Logo linking to home
+ * - Language selector dropdown (Hebrew/English)
+ * - User info with avatar and name (if logged in)
+ * - Theme toggle button (dark/light mode)
+ * 
+ * Uses MUI AppBar and Toolbar components with responsive styling
+ * and dynamic theming based on the current mode.
+ */
+
 import { Link } from "react-router-dom";
 import {
   AppBar,
@@ -21,8 +34,11 @@ import { useCustomTheme } from "../context/ThemeContext";
 
 export default function AppNavbar() {
   const theme = useTheme();
+
   const { lang, setLang } = useLanguage();
+
   const { user } = useAuth();
+
   const { toggleTheme, mode } = useCustomTheme();
 
   const handleLangChange = (event: SelectChangeEvent) => {
@@ -35,14 +51,14 @@ export default function AppNavbar() {
     <AppBar
       position="sticky"
       sx={{
-        bgcolor: isDark ? theme.palette.background.paper : "primary.main",
+        bgcolor: isDark ? theme.palette.background.paper : "primary.main", // Background changes with theme
         boxShadow: 3,
         width: "100%",
-        color: isDark ? theme.palette.text.primary : theme.palette.primary.contrastText,
+        color: isDark ? theme.palette.text.primary : theme.palette.primary.contrastText, // Text color adjusts to theme
       }}
     >
       <Toolbar>
-        {/* Logo & Title */}
+        {/* Left side: Logo and home link */}
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
           <Link
             to="/"
@@ -60,7 +76,7 @@ export default function AppNavbar() {
               sx={{
                 width: 40,
                 height: 40,
-                filter: isDark ? "brightness(0) invert(1)" : "none", // invert logo colors in dark mode if needed
+                filter: isDark ? "brightness(0) invert(1)" : "none", // Invert colors for dark mode if needed
               }}
             />
           </Link>
@@ -68,7 +84,7 @@ export default function AppNavbar() {
 
         {/* Right side controls */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {/* 🌐 Language Selector */}
+          {/* Language Selector Dropdown */}
           <Select
             value={lang}
             onChange={handleLangChange}
@@ -103,7 +119,7 @@ export default function AppNavbar() {
             <MenuItem value="en">English</MenuItem>
           </Select>
 
-          {/* 👤 User Info */}
+          {/* User information - shown only if logged in */}
           {user && (
             <Box
               sx={{
@@ -113,6 +129,7 @@ export default function AppNavbar() {
                 color: isDark ? theme.palette.text.primary : "inherit",
               }}
             >
+              {/* User avatar */}
               <Avatar
                 alt={user.name}
                 src={user.profileImage}
@@ -120,6 +137,7 @@ export default function AppNavbar() {
                   border: isDark ? `1px solid ${theme.palette.divider}` : "none",
                 }}
               />
+              {/* User name */}
               <Box sx={{ textAlign: "right" }}>
                 <Typography
                   sx={{
@@ -134,7 +152,7 @@ export default function AppNavbar() {
             </Box>
           )}
 
-          {/* 🌗 Theme Toggle */}
+          {/* Theme toggle button */}
           <Button
             onClick={toggleTheme}
             sx={{

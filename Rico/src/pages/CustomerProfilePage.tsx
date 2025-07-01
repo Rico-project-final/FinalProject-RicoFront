@@ -1,7 +1,19 @@
+/**
+ * CustomerProfilePage Component
+ * -----------------------------
+ * This page is shown to authenticated customers and displays their review history.
+ * It includes:
+ * - Authentication check and role-based redirect
+ * - Fetching reviews from the backend
+ * - Search input with debounce to filter reviews by text or business name
+ * - Display of each review in a card-style list
+ * - Modal popup to view full comment details
+ * - Logout button for ending the session
+ */
+
 import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
-  Avatar,
   Typography,
   Divider,
   Paper,
@@ -14,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { ReviewForUser } from "../types";
 import { getReviewsByUser } from "../services/review-service";
 import CommentModal from "../components/commentModal";
+import AppNavbar from "../components/Navbar";
 
 const CustomerProfilePage: React.FC = () => {
   const theme = useTheme();
@@ -38,46 +51,38 @@ const CustomerProfilePage: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated || !user) {
       navigate("/");
+    } else if (user.role !== "customer") {
+      navigate("/dashboard");
     } else {
-      if (user.role !== "customer") {
-        navigate("/dashboard");
-      }
       fetchReviews();
     }
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
+  if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+  debounceTimeout.current = setTimeout(() => {
+    const lowerTerm = searchTerm.toLowerCase();
+    setFilteredReviews(
+      searchTerm.trim() === ""
+        ? reviews
+        : reviews.filter((r) =>
+            [r.businessId?.BusinessName ?? "", r.text]
+              .join(" ")
+              .toLowerCase()
+              .includes(lowerTerm)
+          )
+    );
+  }, 500);
+
+  // ✅ ניקוי בטוח שמחזיר תמיד void
+  return () => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
+  };
+}, [searchTerm, reviews]);
 
-    debounceTimeout.current = setTimeout(() => {
-      if (searchTerm.trim() === "") {
-        setFilteredReviews(reviews);
-        return;
-      }
-
-      const lowerTerm = searchTerm.toLowerCase();
-
-      const filtered = reviews.filter((review) => {
-        const businessName = review.businessId?.BusinessName?.toLowerCase() || "";
-        const reviewText = review.text.toLowerCase();
-
-        return (
-          businessName.includes(lowerTerm) ||
-          reviewText.includes(lowerTerm)
-        );
-      });
-
-      setFilteredReviews(filtered);
-    }, 500);
-
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [searchTerm, reviews]);
 
   const handleLogout = () => {
     logout();
@@ -88,138 +93,102 @@ const CustomerProfilePage: React.FC = () => {
     <Box
       sx={{
         p: 4,
-        position: "relative",
-        bgcolor: theme.palette.mode === "dark" ? "#121212" : "background.default",
+        bgcolor: theme.palette.background.default,
         color: theme.palette.text.primary,
         minHeight: "100vh",
       }}
     >
-      {/* Sticky Logout Button */}
-      <Button
-        onClick={handleLogout}
-        variant="outlined"
-        color="error"
+      <AppNavbar />
+
+      {/* Logout Button */}
+      <Box
         sx={{
           position: "fixed",
-          top: 16,
-          right: 16,
-          zIndex: 999,
-          fontWeight: "bold",
-          bgcolor: theme.palette.mode === "dark" ? "#333" : undefined,
-          "&:hover": {
-            bgcolor: theme.palette.mode === "dark" ? "#444" : undefined,
-          },
+          bottom: 24,
+          left: 24,
+          zIndex: 1300,
         }}
       >
-        Logout
-      </Button>
+        <Button
+          onClick={handleLogout}
+          variant="outlined"
+          color="error"
+          sx={{
+            fontWeight: "bold",
+            textTransform: "none",
+            borderRadius: 3,
+            fontSize: "1.1rem",
+            px: 3,
+            py: 1,
+            bgcolor: theme.palette.background.paper,
+            "&:hover": {
+              bgcolor: theme.palette.action.hover,
+            },
+          }}
+        >
+          התנתק
+        </Button>
+      </Box>
 
       {/* Header */}
       <Typography
         variant="h4"
-        sx={{
-          mb: 4,
-          fontWeight: "bold",
-          textAlign: "center",
-          color: theme.palette.text.primary,
-        }}
+        sx={{ mb: 4, fontWeight: "bold", textAlign: "center" }}
       >
-        Welcome back, {user?.name}!
+        שלום, {user?.name || "לקוח יקר"}!
       </Typography>
 
-      {/* User Info */}
-      <Paper
-        sx={{
-          p: 3,
-          mb: 4,
-          maxWidth: 600,
-          mx: "auto",
-          bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
-          color: theme.palette.text.primary,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Avatar
-            src={user?.profileImage || "/default-user.png"}
-            sx={{ width: 64, height: 64 }}
-          />
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", color: theme.palette.text.primary }}
-            >
-              {user?.name}
-            </Typography>
-            <Typography
-              variant="body2"
-              color={theme.palette.text.secondary}
-              sx={{ textAlign: "center" }}
-            >
-              {user?.email}
-            </Typography>
-          </Box>
-        </Box>
-      </Paper>
-
-      {/* Reviews Section */}
-      <Typography
-        variant="h6"
-        sx={{ mb: 2, textAlign: "center", color: theme.palette.text.primary }}
-      >
-        Your Reviews
+      {/* Subheader */}
+      <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+        התגובות שלך
       </Typography>
 
-      {/* Search box */}
+      {/* Search Input */}
       <Box sx={{ maxWidth: 600, mx: "auto", mb: 3 }}>
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search by business name or review text..."
+          placeholder="חפש לפי שם עסק או תוכן תגובה..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
             sx: {
-              bgcolor: theme.palette.mode === "dark" ? "#2c2c2c" : undefined,
+              bgcolor: theme.palette.background.paper,
               color: theme.palette.text.primary,
               "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: theme.palette.mode === "dark" ? "#555" : undefined,
+                borderColor: theme.palette.divider,
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: theme.palette.mode === "dark" ? "#888" : undefined,
+                borderColor: theme.palette.primary.light,
               },
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: theme.palette.mode === "dark" ? "#aaa" : undefined,
+                borderColor: theme.palette.primary.main,
               },
-            },
-          }}
-          sx={{
-            input: {
-              color: theme.palette.text.primary,
             },
           }}
         />
       </Box>
 
-      <Box
-        component={Paper}
+      {/* Reviews List */}
+      <Paper
+        elevation={2}
         sx={{
           p: 2,
           maxWidth: 600,
           mx: "auto",
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "background.paper",
-          color: theme.palette.text.primary,
         }}
       >
         {filteredReviews.length === 0 ? (
           <Typography
             variant="body2"
-            color={theme.palette.text.secondary}
-            sx={{ textAlign: "center" }}
+            sx={{ textAlign: "center", color: theme.palette.text.secondary }}
           >
-            No reviews found.
+            לא נמצאו תגובות.
           </Typography>
         ) : (
           filteredReviews.map((review) => (
@@ -230,46 +199,40 @@ const CustomerProfilePage: React.FC = () => {
                 cursor: "pointer",
                 p: 2,
                 borderRadius: 2,
-                boxShadow: theme.palette.mode === "dark" ? "0 0 8px #222" : 1,
-                bgcolor: theme.palette.mode === "dark" ? "#2c2c2c" : "background.paper",
+                boxShadow: theme.shadows[1],
+                bgcolor: theme.palette.background.default,
                 "&:hover": {
-                  bgcolor: theme.palette.mode === "dark" ? "#3a3a3a" : "grey.100",
+                  bgcolor: theme.palette.action.hover,
                 },
-                textAlign: "center",
               }}
             >
               <Typography
                 variant="subtitle2"
                 fontWeight="bold"
-                color={theme.palette.mode === "dark" ? "#aaa" : "gray"}
-                sx={{ mb: 1 }}
+                sx={{ mb: 1, color: theme.palette.text.secondary }}
               >
-                {review.businessId?.BusinessName || "Unknown Business"}
+                {review.businessId?.BusinessName || "עסק לא ידוע"}
               </Typography>
-              <Typography variant="body1" sx={{ mb: 1, color: theme.palette.text.primary }}>
+              <Typography sx={{ mb: 1 }}>
                 {review.text.length > 100
-                  ? `${review.text.slice(0, 100)}... (click to read more)`
+                  ? `${review.text.slice(0, 100)}... (לחץ לקריאה נוספת)`
                   : review.text}
               </Typography>
               <Divider sx={{ borderColor: theme.palette.divider }} />
-              <Typography
-                variant="caption"
-                color={theme.palette.text.secondary}
-                sx={{ mt: 1 }}
-              >
-                Created at: {new Date(review.createdAt).toLocaleDateString()}
+              <Typography variant="caption" color="text.secondary">
+                נכתב בתאריך: {new Date(review.createdAt).toLocaleDateString()}
               </Typography>
             </Box>
           ))
         )}
-      </Box>
+      </Paper>
 
-      {/* Comment Modal */}
+      {/* Modal */}
       {selectedReview && (
         <CommentModal
           open={Boolean(selectedReview)}
           comment={selectedReview.text}
-          clientName={user?.name || "Customer"}
+          clientName={user?.name || "לקוח"}
           commentDate={selectedReview.createdAt}
           onClose={() => setSelectedReview(null)}
         />

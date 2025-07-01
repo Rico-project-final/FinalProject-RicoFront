@@ -7,3 +7,8 @@ export const connectGoogleBusiness = (code: string, placeId: string) => {
 export const checkGoogleConnection = async () => {
   return apiClient.get('/googleBusiness/isGoogleConnected');
 };
+
+export const syncGoogleReviews = async () => {
+    return apiClient.post('/googleBusiness/syncGoogleReviews');
+};
+

@@ -30,7 +30,11 @@ export const ToDoPage: React.FC = () => {
   const fetchAllTasks = async (currentPage: number) => {
     try {
       const response = await getAllTasks(currentPage, 10);
-      setTaskList((prev) => [...prev, ...response.data.tasks]);
+      setTaskList((prev) => {
+      const existingIds = new Set(prev.map((task) => task._id));
+      const uniqueNewTasks = response.data.tasks.filter((task) => !existingIds.has(task._id));
+      return [...prev, ...uniqueNewTasks];
+    });
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -104,7 +108,7 @@ export const ToDoPage: React.FC = () => {
       }}
     >
       <Typography variant="h4" sx={{ mb: 3 }}>
-        {t("todo")}
+        משימות
       </Typography>
 
       <TableContainer
@@ -120,16 +124,16 @@ export const ToDoPage: React.FC = () => {
           <TableHead>
             <TableRow sx={{ bgcolor: theme.palette.action.hover }}>
               <TableCell sx={headCellSx} align="center">
-                {t("task")}
+                משימות
               </TableCell>
               <TableCell sx={headCellSx} align="center">
-                {t("status")}
+                סטטוס
               </TableCell>
               <TableCell sx={headCellSx} align="center">
-                {t("priority")}
+                דחיפות
               </TableCell>
               <TableCell sx={headCellSx} align="center">
-                {t("actions")}
+                פעולות
               </TableCell>
             </TableRow>
           </TableHead>

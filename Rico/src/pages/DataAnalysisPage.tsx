@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useLanguage } from "../context/language/LanguageContext";
 import DataCard from "../components/dataCard";
 import CommentsColumn from "../components/commentsColumn";
 import { ReviewAnalysis } from "../types";
 import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
-import { CircularProgress } from "@mui/material";
 
 
 export const DataAnalysisPage: React.FC = () => {
   const theme = useTheme();
-  const { lang, t } = useLanguage();
   const [reviewsAnalasys, setReviewsAnalasys] = useState<ReviewAnalysis[]>();
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+
   const fetchReviewsAnalysis = async (currentPage: number) => {
     try {
       const response = await getAllReviewAnalyses(currentPage, 10);
-      setReviewsAnalasys((prev) => [...(prev ?? []), ...response.data.reviews]);
+      setReviewsAnalasys((prev) => {
+          const newReviews = response.data.reviews;
+          const existingIds = new Set((prev ?? []).map((r) => r.reviewId));
+          const filtered = newReviews.filter((r) => !existingIds.has(r.reviewId));
+          return [...(prev ?? []), ...filtered];
+        });
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Failed to fetch review analyses:", error);
@@ -62,7 +66,7 @@ export const DataAnalysisPage: React.FC = () => {
           variant="h4"
           sx={{ mb: 3, color: theme.palette.text.primary }}
         >
-          {t("dataAnalysis")}
+          ניתוח נתונים
         </Typography>
 
         {error && (
@@ -102,7 +106,7 @@ export const DataAnalysisPage: React.FC = () => {
           <CommentsColumn
             type="positive"
             comments={
-              reviewsAnalasys?.filter((item) => item.sentiment === "positive") ||
+              reviewsAnalasys?.filter((item) => item.sentiment === "positive" && item.userId) ||
               []
             }
           />
@@ -111,7 +115,7 @@ export const DataAnalysisPage: React.FC = () => {
           <CommentsColumn
             type="negative"
             comments={
-              reviewsAnalasys?.filter((item) => item.sentiment === "negative") ||
+              reviewsAnalasys?.filter((item) => item.sentiment === "negative" && item.userId) ||
               []
             }
           />

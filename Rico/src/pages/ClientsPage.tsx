@@ -35,7 +35,12 @@ export const ClientsPage: React.FC = () => {
   const fetchAllUsers = async (currentPage: number) => {
     try {
       const response = await getAllUsers(currentPage, 15);
-      setUsers((prev) => [...prev, ...response.data.users]);
+      setUsers((prev) => {
+      const newUsers = response.data.users;
+      const existingIds = new Set(prev.map((u) => u._id));
+      const uniqueNewUsers = newUsers.filter((u) => !existingIds.has(u._id));
+      return [...prev, ...uniqueNewUsers];
+    });
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -87,7 +92,7 @@ export const ClientsPage: React.FC = () => {
           fullWidth
           variant="outlined"
           size="small"
-          placeholder={t("searchClient")}
+          placeholder= "חפש שם לקוח"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           sx={{
@@ -111,16 +116,16 @@ export const ClientsPage: React.FC = () => {
             <TableHead>
               <TableRow sx={{ bgcolor: theme.palette.action.hover }}>
                 <TableCell sx={headCellSx} align="center">
-                  {t("id")}
+                  מספר מזהה
                 </TableCell>
                 <TableCell sx={headCellSx} align="center">
-                  {t("email")}
+                  אימייל
                 </TableCell>
                 <TableCell sx={headCellSx} align="center">
-                  {t("name")}
+                  שם
                 </TableCell>
                 <TableCell sx={headCellSx} align="center">
-                  {t("contact")}
+                  צור קשר
                 </TableCell>
                 <TableCell sx={headCellSx} align="center"></TableCell>
               </TableRow>

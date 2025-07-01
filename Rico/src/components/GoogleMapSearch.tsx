@@ -1,21 +1,33 @@
+/**
+ * GoogleMapSearch Component
+ * -------------------------
+ * Provides a Google Maps interface with a search box for users to search for businesses.
+ * Displays a marker and info window for the selected business with its details and photo.
+ * Users can connect the selected business by clicking the button in the info window.
+ * The map centers on user's current location if available, else defaults to Tel Aviv.
+ * 
+ * Props:
+ * - onPlaceSelected: Callback triggered when a place is selected from the search box.
+ * - onConnectBusiness: Callback triggered when the user clicks "Connect my business" button.
+ * - selectedBusiness: The currently selected Google Places business (may be null).
+ */
+
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   GoogleMap,
-  LoadScript,
   Marker,
   StandaloneSearchBox,
   InfoWindow,
 } from "@react-google-maps/api";
 
-const libraries: ("places")[] = ["places"];
 const containerStyle = {
   width: "100%",
   height: "400px",
 };
 
 const centerDefault = {
-  lat: 32.0853,
-  lng: 34.7818,
+  lat: 32.0853, // Default latitude (Tel Aviv)
+  lng: 34.7818, // Default longitude
 };
 
 interface GoogleMapProps {
@@ -39,17 +51,19 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
     searchBoxRef.current = ref;
   }, []);
 
+  // Handle when user selects a place from the search box suggestions
   const onPlacesChanged = () => {
     const places = searchBoxRef.current?.getPlaces();
     if (places && places.length > 0) {
       const place = places[0];
-      if (!place.geometry?.location) return;
+      if (!place.geometry?.location) return; // Ignore places without location data
 
-      onPlaceSelected(place);
-      setInfoWindowOpen(true);
+      onPlaceSelected(place); // Inform parent about selected place
+      setInfoWindowOpen(true); // Show info window for selected place
     }
   };
 
+  // When `selectedBusiness` changes, update map center, marker and open info window
   useEffect(() => {
     if (selectedBusiness?.geometry?.location) {
       const loc = selectedBusiness.geometry.location;
@@ -63,6 +77,7 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
     }
   }, [selectedBusiness]);
 
+  // On mount, try to get user's current location for map centering and search bias
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -77,6 +92,7 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
         });
       },
       () => {
+        // If geolocation fails, fallback to default center and bounds
         setMapCenter(centerDefault);
         setLocationBiasBounds({
           north: centerDefault.lat + 0.05,
@@ -88,14 +104,12 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
     );
   }, []);
 
-  // מחלץ את התמונה הראשונה אם קיימת
+  // Extract the first photo of the selected business if available
   const firstPhoto = selectedBusiness?.photos?.[0];
 
   return (
-    <LoadScript
-      googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}
-      libraries={libraries}
-    >
+    <>
+      {/* Google Places search box with location bias */}
       <StandaloneSearchBox
         onLoad={onLoadSearchBox}
         onPlacesChanged={onPlacesChanged}
@@ -123,21 +137,24 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
         />
       </StandaloneSearchBox>
 
+      {/* Google Map showing the selected business marker */}
       <GoogleMap mapContainerStyle={containerStyle} center={mapCenter} zoom={15}>
         {markerPosition && (
           <>
+            {/* Marker at the business location */}
             <Marker
               position={markerPosition}
               onClick={() => setInfoWindowOpen(true)}
               cursor="pointer"
             />
+            {/* InfoWindow shows business details and connect button */}
             {infoWindowOpen && selectedBusiness && (
               <InfoWindow
                 position={markerPosition}
                 onCloseClick={() => setInfoWindowOpen(false)}
               >
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 10, maxWidth: 300 }}>
-                  {/* תמונה מימין */}
+                  {/* Business photo on the right, if exists */}
                   {firstPhoto && (
                     <img
                       src={firstPhoto.getUrl({ maxWidth: 100, maxHeight: 100 })}
@@ -152,7 +169,7 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
                     />
                   )}
 
-                  {/* תוכן טקסט וכפתור משמאל */}
+                  {/* Business name, address and connect button on the left */}
                   <div style={{ flex: 1 }}>
                     <h3 style={{ margin: "0 0 5px" }}>{selectedBusiness.name}</h3>
                     <p style={{ margin: "0 0 10px", fontSize: 14 }}>
@@ -178,7 +195,7 @@ const GoogleMapSearch: React.FC<GoogleMapProps> = ({
           </>
         )}
       </GoogleMap>
-    </LoadScript>
+    </>
   );
 };
 

@@ -1,3 +1,15 @@
+/**
+ * SendEmailModal Component
+ * ------------------------
+ * A modal dialog that allows an admin to write and send a response email to a customer.
+ *
+ * Props:
+ * - open: boolean indicating if the modal is open
+ * - onClose: function to close the modal
+ * - email: recipient's email address
+ * - text: initial text for the admin response
+ */
+
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -26,29 +38,40 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({
   email,
   text,
 }) => {
-  const theme = useTheme(); // 👈 Access MUI theme
+  const theme = useTheme(); // Access MUI theme for styling
+
+  // State to hold the email response text, initialized with 'text' prop
   const [emailResponse, setEmailResponse] = useState<string>(text);
+
+  // Snackbar state for user feedback messages
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
 
+  // Sync emailResponse with text prop when text changes
   useEffect(() => {
     setEmailResponse(text);
   }, [text]);
 
+  // Handle sending the email via API call
   const handleSendEmail = async () => {
     try {
+      // Basic validation: require email and response text
       if (!email || !text) return;
 
       const response = await sendResponseToCustomer(email, emailResponse);
+
       if (response.status !== 200) throw new Error("Failed to send email");
 
+      // Show success message and close modal
       setSnackbarMessage("Email sent successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
       onClose();
     } catch (error) {
       console.error("Failed to send email:", error);
+
+      // Show error message on failure
       setSnackbarMessage("Failed to send email. Please try again later.");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
@@ -65,20 +88,18 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: 320, sm: 400 },
-            bgcolor: theme.palette.background.default, // respects light/dark mode
-            color: theme.palette.text.primary, // ensures text color adjusts
+            bgcolor: theme.palette.background.default,
+            color: theme.palette.text.primary,         
             boxShadow: 24,
             p: 4,
             borderRadius: 3,
           }}
         >
+          {/* Modal header with title and close button */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
             <Typography
               variant="h6"
-              sx={{
-                fontWeight: "bold",
-                color: theme.palette.text.primary, // explicitly override
-              }}
+              sx={{ fontWeight: "bold", color: theme.palette.text.primary }}
             >
               Admin Response
             </Typography>
@@ -87,6 +108,7 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({
             </IconButton>
           </Box>
 
+          {/* Text area for entering the response */}
           <TextField
             fullWidth
             multiline
@@ -100,6 +122,7 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({
             }}
           />
 
+          {/* Send button aligned to the right */}
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
             <Button
               variant="contained"
@@ -119,6 +142,7 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({
         </Box>
       </Modal>
 
+      {/* Snackbar for success/error notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={5000}

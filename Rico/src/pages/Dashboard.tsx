@@ -1,49 +1,47 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
-  Typography,
   Paper,
-  Button,
-  Divider,
-  CircularProgress,
+  Typography,
   Snackbar,
   Alert,
-  Link,
+  CircularProgress,
+  Modal,
+  Backdrop,
 } from "@mui/material";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { useTheme } from "@mui/material/styles";
 import { useLanguage } from "../context/language/LanguageContext";
 import { TranslationKeys } from "../context/language/types";
 import { getDashboardStats } from "../services/user-service";
 import { Review, ReviewAnalysis } from "../types";
 import CommentModal from "../components/commentModal";
-import { getAllReviewAnalysesNoPage } from "../services/reviewAnalaysis-service";
-import GoogleMapSearch from "../components/GoogleMapSearch";
-import GoogleIcon from "@mui/icons-material/Google";
-import { generateBusinessQr} from '../services/business-service';
-import { connectGoogleBusiness, checkGoogleConnection } from "../services/googleBusiness-service";
+import { getAllReviewAnalysesNoPage, getReviewAnalysisStatus } from "../services/reviewAnalaysis-service";
+import {
+  generateBusinessQr,
+  getLastSyncDate,
+} from "../services/business-service";
+import {
+  connectGoogleBusiness,
+  checkGoogleConnection,
+  syncGoogleReviews,
+} from "../services/googleBusiness-service";
 
+import StatsCards from "../components/StatsCards";
+import ReviewsList from "../components/ReviewsList";
+import ReviewChart from "../components/ReviewChart";
+import QrCodeSection from "../components/QrCodeSection";
+import GoogleConnectSection from "../components/GoogleConnectSection";
 
 export const Dashboard: React.FC = () => {
   const theme = useTheme();
   const { lang, t } = useLanguage();
 
-  const [stats, setStats] = useState<
-    Array<{
-      label: keyof TranslationKeys;
-      icon: string;
-      changeColor: string;
-      changeText: keyof TranslationKeys;
-    }>
-  >([
+  const [stats] = useState<Array<{
+    label: keyof TranslationKeys;
+    icon: string;
+    changeColor: string;
+    changeText: keyof TranslationKeys;
+  }>>([
     {
       label: "totalClients",
       icon: "👤",
@@ -63,41 +61,113 @@ export const Dashboard: React.FC = () => {
       changeText: "upFromYesterday",
     },
   ]);
-  
 
   const [totalStats, setTotalStats] = useState({
     totalReviews: 0,
     totalClients: 0,
     totalTasks: 0,
   });
+
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewChartData, setReviewChartData] = useState<any[]>([]);
   const [qrImage, setQrImage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const [selectedBusiness, setSelectedBusiness] =
-    useState<google.maps.places.PlaceResult | null>(null);
   const [selectedComment, setSelectedComment] = useState<string>("");
   const [selectedClientName, setSelectedClientName] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string | Date>(new Date());
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
-  // סטייטים לתהליך OAuth
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [oauthError, setOauthError] = useState<string | null>(null);
-  const [oauthSuccess, setOauthSuccess] = useState<string | null>(null);
-  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
-  const [googlePlaceId, setGooglePlaceId] = useState<string>("");
+  const [selectedBusiness, setSelectedBusiness] = useState<google.maps.places.PlaceResult | null>(null);
+  const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const [lastSyncDate, setLastSyncDate] = useState<Date | null>(null);
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const [previousReviewCount, setPreviousReviewCount] = useState<number | null>(null);
+
+
+  const showError = (msg: string) => {
+    setErrorMessage(msg);
+    setOpenSnackbar(true);
+  };
 
   let oauthWindow: Window | null = null;
-  // שלב ראשוני - לחיצה על התחברות לעסק
-  const handleConnectBusiness = async (
-    place: google.maps.places.PlaceResult
-  ) => {
+
+  // פונקציה חדשה לבדיקת סטטוס הניתוח מול השרת
+const MAX_RETRIES = 20;
+
+const checkReviewAnalysisStatus = async (retryCount = 0): Promise<void> => {
+  if (retryCount >= MAX_RETRIES) {
+    setIsAnalyzing(false);
+    showError("Timeout while waiting for review analysis.");
+    return;
+  }
+
+  try {
+    const res = await getReviewAnalysisStatus();
+    const { allAnalyzed } = res.data;
+
+    if (!allAnalyzed) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      return checkReviewAnalysisStatus(retryCount + 1);
+    }
+
+    // Update and stop
+    const dashboardRes = await getDashboardStats();
+    setTotalStats(dashboardRes.data);
+    setReviews(dashboardRes.data.lastWeekReviews);
+
+    const analysisRes = await getAllReviewAnalysesNoPage();
+    const chart = transformReviewsToChartData(analysisRes.data);
+    setReviewChartData(chart);
+
+    setIsAnalyzing(false);
+  } catch (error) {
+    console.error("Error checking analysis status:", error);
+    showError("שגיאה בבדיקת סטטוס ניתוח ביקורות.");
+    setIsAnalyzing(false);
+  }
+};
+
+
+
+// עדכון handleSyncReviews
+const handleSyncReviews = async () => {
+  try {
+    setIsSyncing(true);
+    setIsAnalyzing(true);
+
+    await syncGoogleReviews();
+
+    const date = await getLastSyncDate();
+    setLastSyncDate(date.data.lastSyncDate ? new Date(date.data.lastSyncDate) : null);
+
+    await checkReviewAnalysisStatus();
+  } catch (error) {
+    console.error("Error syncing reviews:", error);
+    showError("שגיאה בסנכרון ביקורות מגוגל.");
+    setIsAnalyzing(false);
+  } finally {
+    setIsSyncing(false);
+  }
+};
+
+
+  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
+  setSelectedBusiness(place);
+  if (place.place_id) {
+    localStorage.setItem("selectedPlaceId", place.place_id);
+  }
+};
+
+  const handleConnectBusiness = async (place: google.maps.places.PlaceResult) => {
     setSelectedBusiness(place);
-    setIsConnecting(true);
-    setOauthError(null);
-    setOauthSuccess(null);
+    setIsGoogleConnected(false);
+    console.log("Connecting to Google Business for place:", place);
 
     const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
     const redirectUri = `${window.location.origin}/google-business-callback`;
@@ -118,65 +188,42 @@ export const Dashboard: React.FC = () => {
     );
 
     if (!oauthWindow) {
-      setIsConnecting(false);
-      setOauthError("לא הצלחנו לפתוח את חלון ההתחברות");
-      return;
+      showError("לא הצלחנו לפתוח את חלון ההתחברות");
     }
-        }
+  };
 
-    // מאזין לאירוע postMessage מהחלון שנפתח (callback)
-  const handleMessage = async (event: MessageEvent) => {
-  // בדיקת מקור להבטחת אבטחה
+const handleMessage = async (event: MessageEvent) => {
   if (event.origin !== window.location.origin) return;
 
   const { data } = event;
   if (data.type === "google-oauth-code" && data.code) {
-    // סגירת חלון ההתחברות והסרת מאזין
-    if (oauthWindow) {
-      oauthWindow.close();
-    }
+    if (oauthWindow) oauthWindow.close();
     window.removeEventListener("message", handleMessage);
 
-    if (!selectedBusiness?.place_id) {
-      alert("מזהה העסק בגוגל לא זמין.");
+    const savedPlaceId = localStorage.getItem("selectedPlaceId");
+
+    if (!savedPlaceId) {
+      showError("מזהה העסק בגוגל לא זמין.");
       return;
     }
 
     try {
-      setIsConnecting(true);
-
-      const response = await connectGoogleBusiness(data.code, selectedBusiness.place_id);
-
-      // בדיקה אם הבקשה הצליחה
+      const response = await connectGoogleBusiness(data.code, savedPlaceId);
       if (response.status === 200) {
-        setOauthSuccess("התחברת בהצלחה לעסק!");
+        console.log("Google Business connected successfully:", response.data);
         setIsGoogleConnected(true);
-        setGooglePlaceId(selectedBusiness.place_id);
+        localStorage.removeItem("selectedPlaceId"); // ניקוי אחרי הצלחה
       } else {
-        setOauthError("אירעה שגיאה בהתחברות לעסק.");
+        console.error("Failed to connect Google Business:", response);
+        showError("החיבור לעסק בגוגל נכשל.");
       }
     } catch (err) {
       console.error("OAuth Error:", err);
-      setOauthError("אירעה שגיאה בהתחברות לגוגל עסקי.");
-    } finally {
-      setIsConnecting(false);
+      showError("שגיאה בחיבור לחשבון גוגל.");
     }
   }
 };
 
-
-  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
-    setSelectedBusiness(place);
-  };
-
-  const handleGenerateQR = async () => {
-    try {
-      const res = await generateBusinessQr();
-      setQrImage(res.data.image);
-    } catch (err) {
-      console.error("Error generating QR:", err);
-    }
-  };
 
   const handleOpenModal = (comment: string, clientName: string, date: string | Date) => {
     setSelectedComment(comment);
@@ -189,157 +236,125 @@ export const Dashboard: React.FC = () => {
     const months = Array.from({ length: 12 }, (_, i) =>
       new Date(0, i).toLocaleString("default", { month: "short" })
     );
-
-    const initialData = months.map((month) => ({ name: month, food: 0, service: 0, experience: 0 }));
+    const initialData = months.map((month) => ({
+      name: month,
+      food: 0,
+      service: 0,
+      experience: 0,
+    }));
 
     reviews.forEach((review) => {
       const monthIndex = new Date(review.createdAt).getMonth();
-      const categoryKey = review.category === "overall experience" ? "experience" : review.category;
+      const categoryKey =
+        review.category === "overall experience" ? "experience" : review.category;
       (initialData[monthIndex] as any)[categoryKey]++;
     });
 
     return initialData;
   };
 
+      const fetchDashboardData = async () => {
+      try {
+        const response = await getDashboardStats();
+        setTotalStats(response.data);
+        setReviews(response.data.lastWeekReviews);
+      } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
+        showError("שגיאה בטעינת נתוני לוח המחוונים.");
+      }
+    };
+
+    const fetchReviews = async () => {
+      try {
+        const response = await getAllReviewAnalysesNoPage();
+        const chart = transformReviewsToChartData(response.data);
+        setReviewChartData(chart);
+      } catch (error) {
+        console.error("Error fetching review analyses:", error);
+        showError("שגיאה בטעינת נתוני הביקורות.");
+      }
+    };
+
+    const fetchConnectionStatus = async () => {
+      try {
+        const res = await checkGoogleConnection();
+        setIsGoogleConnected(res.data.isGoogleConnected);
+      } catch (error) {
+        console.error("Error checking Google connection:", error);
+        showError("שגיאה בבדיקת מצב החיבור לחשבון גוגל.");
+      }
+    };
+
   useEffect(() => {
-  const fetchDashboardData = async () => {
-    try {
-      const response = await getDashboardStats();
-      setTotalStats(response.data);
-      setReviews(response.data.lastWeekReviews);
-    } catch (e: any) {
-      setError("error while loading data");
-    }
-  };
 
-  const fetchReviews = async () => {
+    fetchDashboardData();
+    fetchReviews();
+    fetchConnectionStatus();
+    fetchLastSyncDate();
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  const handleGenerateQR = async () => {
     try {
-      const response = await getAllReviewAnalysesNoPage();
-      const chart = transformReviewsToChartData(response.data);
-      setReviewChartData(chart);
+      const res = await generateBusinessQr();
+      setQrImage(res.data.image);
     } catch (error) {
-      console.error("Failed to fetch review analyses:", error);
-      setError("Failed to fetch review analyses");
+      console.error("Error generating QR code:", error);
+      showError("שגיאה ביצירת קוד QR.");
     }
   };
 
-  const fetchConnectionStatus = async () => {
-    try {
-      const res = await checkGoogleConnection();
-      setIsGoogleConnected(res.data.isGoogleConnected);
-      console.log("Google connection status:", res.data.isGoogleConnected);
-      console.log("res:", res.status);
-    } catch (error) {
-      console.error("Error checking Google connection:", error);
-    }
-  };
-
-  fetchDashboardData();
-  fetchReviews();
-  fetchConnectionStatus();
-}, []);
-
-
-  if (error) return <Typography color="error">{error}</Typography>;
-
-  function handleSyncReviews(): void {
-    throw new Error("Function not implemented.");
+  const fetchLastSyncDate = async () => {
+  try {
+    const res = await getLastSyncDate();
+    setLastSyncDate(res.data.lastSyncDate ? new Date(res.data.lastSyncDate) : null);
+  } catch (error) {
+    console.error("Error fetching last sync date:", error);
   }
+};
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction: lang === "he" ? "rtl" : "ltr" }}>
+    
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        backgroundColor: theme.palette.background.default,
+        direction: lang === "he" ? "rtl" : "ltr",
+      }}
+    >
       <Box sx={{ flex: 1, p: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3, color: theme.palette.text.primary }}>{t("dashboard")}</Typography>
-
-        <Box sx={{ display: "flex", gap: 3, mb: 4 }}>
-          {stats.map((stat) => (
-            <Paper key={stat.label} sx={{ backgroundColor: theme.palette.background.paper, borderRadius: 2, boxShadow: 3, p: 3, minWidth: 220, flex: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography sx={{ fontSize: 14, color: theme.palette.text.secondary }}>{t(stat.label)}</Typography>
-              <Typography sx={{ fontSize: 28, color: theme.palette.text.primary }}>{totalStats[stat.label as keyof typeof totalStats]} {stat.icon}</Typography>
-            </Paper>
-          ))}
-        </Box>
+        <Typography variant="h4" sx={{ mb: 3, color: theme.palette.text.primary }}>
+          דשבורד
+        </Typography>
+        <StatsCards stats={stats} totalStats={totalStats} />
 
         <Box sx={{ display: "flex", gap: 3 }}>
           <Paper sx={{ flex: 1, p: 3, borderRadius: 2, backgroundColor: theme.palette.background.paper }}>
-            <Typography sx={{ fontWeight: "bold", fontSize: 20, textAlign: "center", mb: 2, color: theme.palette.text.primary }}>{t("reviewsAddedThisWeek")}</Typography>
-            {reviews.map((c, i) => (
-              <Box key={i} sx={{ mb: 2 }}>
-                <Typography sx={{ mb: 1, cursor: "pointer", fontSize: 14, color: theme.palette.text.primary }}
-                  onClick={() => handleOpenModal(c.text, (c.userId as { name: string }).name, c.createdAt)}>
-                  {c.text}
-                </Typography>
-                {i < reviews.length - 1 && <Divider sx={{ mt: 2, borderColor: theme.palette.divider }} />}
-              </Box>
-            ))}
+            <ReviewsList reviews={reviews} onOpenModal={handleOpenModal} />
           </Paper>
 
           <Paper sx={{ flex: 1, p: 3, borderRadius: 2, backgroundColor: theme.palette.background.paper }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-              <Typography sx={{ fontWeight: "bold", fontSize: 20, color: theme.palette.text.primary }}>{t("allAreas")}</Typography>
-              <Typography sx={{ fontSize: 14, color: theme.palette.text.secondary }}>{t("thisYear")} ▼</Typography>
-            </Box>
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={reviewChartData}>
-                <XAxis dataKey="name" stroke={theme.palette.text.secondary} />
-                <YAxis stroke={theme.palette.text.secondary} />
-                <Tooltip contentStyle={{ backgroundColor: theme.palette.background.paper, borderColor: theme.palette.divider }} labelStyle={{ color: theme.palette.text.primary }} itemStyle={{ color: theme.palette.text.primary }} />
-                <Legend wrapperStyle={{ color: theme.palette.text.primary }} />
-                <Line type="monotone" dataKey="food" stroke="#6b7cff" />
-                <Line type="monotone" dataKey="service" stroke="#e17cff" />
-                <Line type="monotone" dataKey="experience" stroke="#ff7c7c" />
-              </LineChart>
-            </ResponsiveContainer>
+            <ReviewChart data={reviewChartData} />
           </Paper>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 4, flexWrap: "wrap" }}>
-          <Paper sx={{ minWidth: 280, p: 3, borderRadius: 2, backgroundColor: theme.palette.background.paper, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-            <Typography sx={{ fontWeight: "bold", fontSize: 20, color: theme.palette.text.primary }}>יצירת QR</Typography>
-            <Button onClick={handleGenerateQR} variant="contained">צור QR</Button>
-            {qrImage && (
-              <>
-                <img src={qrImage} alt="QR Code" style={{ marginTop: 16, width: 200, height: 200 }} />
-                <Button onClick={() => { const link = document.createElement("a"); link.href = qrImage; link.download = "business-qr.png"; link.click(); }} variant="outlined">הורד QR</Button>
-              </>
-            )}
-          </Paper>
-      {!isGoogleConnected ? (
-  <Box sx={{ mt: 4 }}>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-      <GoogleIcon sx={{ color: '#4285F4', fontSize: 28 }} />
-      <Typography sx={{ fontWeight: "bold", fontSize: 20, color: theme.palette.text.primary }}>
-        התחברות לגוגל עסקי
-      </Typography>
-    </Box>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 4 }}>
+          <QrCodeSection qrImage={qrImage} onGenerateQR={handleGenerateQR} />
 
-    <Paper
-      sx={{
-        minWidth: 280,
-        height: 300,
-        borderRadius: 2,
-        backgroundColor: theme.palette.background.paper,
-      }}
-    >
-      <GoogleMapSearch
-        onPlaceSelected={handlePlaceSelected}
-        onConnectBusiness={handleConnectBusiness}
-        selectedBusiness={selectedBusiness}
-      />
-    </Paper>
-  </Box>
-) : (
-  <Paper sx={{ mt: 4, p: 3 }}>
-    <Typography>✔️ העסק שלך מחובר ל Google</Typography>
-    <Typography variant="body2">סנכרון אחרון: 22/06/2025</Typography>
-    <Button variant="outlined" onClick={handleSyncReviews}>
-      סנכרן שוב ביקורות
-    </Button>
-    
-  </Paper>
-)}
+          <GoogleConnectSection
+              isGoogleConnected={isGoogleConnected}
+              isSyncing={isAnalyzing && isSyncing}
+              lastSyncDate={lastSyncDate}
+              onSyncReviews={handleSyncReviews}
+              onPlaceSelected={handlePlaceSelected}
+              onConnectBusiness={handleConnectBusiness}
+              selectedBusiness={selectedBusiness}
+            />
 
-      </Box>
+        </Box>
       </Box>
 
       <CommentModal
@@ -349,6 +364,87 @@ export const Dashboard: React.FC = () => {
         commentDate={selectedDate}
         onClose={() => setIsCommentModalOpen(false)}
       />
+
+      {/* Snackbar for errors */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="error"
+          variant="filled"
+          onClose={() => setOpenSnackbar(false)}
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+      {isAnalyzing && (
+  <Box
+    sx={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      backgroundColor: "rgba(0,0,0,0.4)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1300,
+    }}
+  >
+    <Paper
+      elevation={3}
+      sx={{
+        padding: 4,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minWidth: 250,
+        borderRadius: 2,
+      }}
+    >
+  <Modal
+        open={isAnalyzing}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+            sx: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
+          },
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            p: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            boxShadow: 24,
+          }}
+        >
+          <CircularProgress />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            מנתח תגובות...
+          </Typography>
+        </Box>
+      </Modal>
+
+    </Paper>
+  </Box>
+)}
     </Box>
   );
 };
+

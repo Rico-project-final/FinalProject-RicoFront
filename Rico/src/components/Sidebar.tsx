@@ -1,3 +1,15 @@
+/**
+ * Sidebar Component
+ * -----------------
+ * Provides a vertical navigation menu for the app with main navigation links,
+ * pages section, and a logout button at the bottom.
+ * 
+ * Features:
+ * - Highlights the active menu item based on current URL path
+ * - Supports dark and light themes with corresponding styles
+ * - Handles logout functionality and redirects to home
+ */
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -6,7 +18,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography,
   Divider,
   useTheme,
 } from '@mui/material';
@@ -23,12 +34,15 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/auth-context';
 
 const Sidebar: React.FC = () => {
-  const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { logout } = useAuth();
+  const theme = useTheme(); // MUI theme for styling
+  const location = useLocation(); // current URL path to track active menu item
+  const navigate = useNavigate(); // navigation function for redirects
+  const { logout } = useAuth(); // auth context to handle logout
+
+  // State to track which menu item is currently active
   const [activeItem, setActiveItem] = useState(location.pathname);
 
+  // Define main menu navigation items with icon and label
   const menuItems = [
     { id: '/dashboard', label: 'בית', icon: <HomeIcon /> },
     { id: '/reviews', label: 'תגובות', icon: <GridViewIcon /> },
@@ -36,23 +50,27 @@ const Sidebar: React.FC = () => {
     { id: '/optimization', label: 'הצעות ייעול', icon: <AssignmentIcon /> },
   ];
 
+  // Secondary pages menu items
   const pagesMenuItems = [
     { id: '/customers', label: 'לקוחות', icon: <PeopleIcon /> },
     { id: '/todo', label: 'משימות', icon: <CheckBoxIcon /> },
   ];
 
+  // Bottom menu item for logout
   const bottomMenuItems = [{ id: '/logout', label: 'התנתק', icon: <LogoutIcon /> }];
 
+  // Handle menu item clicks - update active item, handle logout logic
   const handleItemClick = async (id: string) => {
     setActiveItem(id);
     if (id === '/logout') {
       await logout();
-      navigate('/'); // Redirect to home or login page
+      navigate('/'); // Redirect to home or login page after logout
     }
   };
 
-  const isDark = theme.palette.mode === 'dark';
+  const isDark = theme.palette.mode === 'dark'; // Track dark mode for styling
 
+  // Component for rendering a single menu item with styles and behavior
   const MenuItem = ({
     item,
     isActive,
@@ -60,7 +78,7 @@ const Sidebar: React.FC = () => {
     item: { id: string; label: string; icon: React.ReactNode };
     isActive: boolean;
   }) => {
-    // Colors based on theme and active state
+    // Define colors based on theme mode and active state
     const activeBgColor = isDark ? theme.palette.primary.dark : '#f3f1e7';
     const hoverBgColor = isDark ? theme.palette.primary.main : '#ece8d9';
     const textColor = isActive
@@ -75,6 +93,7 @@ const Sidebar: React.FC = () => {
     return (
       <ListItem disablePadding>
         <ListItemButton
+          // Use Link for navigation except for logout (button)
           component={item.id === '/logout' ? 'button' : Link}
           to={item.id !== '/logout' ? item.id : undefined}
           onClick={() => handleItemClick(item.id)}
@@ -128,25 +147,18 @@ const Sidebar: React.FC = () => {
         color: isDark ? theme.palette.text.primary : undefined,
       }}
     >
+      {/* Main menu items */}
       <List>
         {menuItems.map((item) => (
           <MenuItem key={item.id} item={item} isActive={activeItem === item.id} />
         ))}
       </List>
 
+      {/* Divider and PAGES section label */}
       <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
-      <Typography
-        variant="caption"
-        sx={{
-          px: 2,
-          py: 1,
-          color: isDark ? theme.palette.text.secondary : '#888',
-          fontWeight: 500,
-          letterSpacing: 1,
-        }}
-      >
-        PAGES
-      </Typography>
+
+
+      {/* Pages menu items */}
       <List>
         {pagesMenuItems.map((item) => (
           <MenuItem key={item.id} item={item} isActive={activeItem === item.id} />
@@ -155,6 +167,8 @@ const Sidebar: React.FC = () => {
 
       <Box sx={{ flexGrow: 1 }} />
       <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
+
+      {/* Logout button */}
       <List>
         {bottomMenuItems.map((item) => (
           <MenuItem key={item.id} item={item} isActive={activeItem === item.id} />

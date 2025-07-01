@@ -76,14 +76,14 @@ export const ImprovementSuggestionsPage: React.FC = () => {
 
     try {
       await updateReviewAnalysisResolved(selectedReviewId);
-      //TODO :: Replace "admin" with real userId from context
+      //TODO :: add priority to task
       await createTask({
         title: selectedSuggestion,
         description: selectedSummary,
         relatedReview: selectedReviewId,
         isCompleted: false,
         dueDate: selectedDueDate,
-        createdBy: "admin", // Replace with real userId from context
+        createdBy: "admin", 
       });
 
       setReviewAnalaysis((prev) =>
@@ -133,9 +133,9 @@ export const ImprovementSuggestionsPage: React.FC = () => {
             <TableHead>
               <TableRow sx={{ backgroundColor: theme.palette.action.hover }}>
                 <TableCell sx={headCellSx} width={120}>
-                  {t("addTask")}
+                  הוסף משימה
                 </TableCell>
-                <TableCell sx={headCellSx}>{t("suggestion")}</TableCell>
+                <TableCell sx={headCellSx}>הצעות ייעול</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -145,7 +145,7 @@ export const ImprovementSuggestionsPage: React.FC = () => {
                   <TableRow key={s.reviewId}>
                     <TableCell align="center">
                       <Button onClick={() => handleClickSuggestion(s.reviewId)}>
-                        {t("addTask")}
+                        הוסף משימה
                       </Button>
                     </TableCell>
                     <TableCell sx={{ py: 1.5 }}>{s.suggestions}</TableCell>

@@ -22,3 +22,7 @@ export const getReviewAnalysisById = (reviewId: string) => {
 export const updateReviewAnalysisResolved = (reviewId: string) => {
   return apiClient.post<ReviewAnalysis>(`/analysis/update/${reviewId}`);
 };
+
+export const getReviewAnalysisStatus = () => {
+  return apiClient.get<{ allAnalyzed: boolean }>('/analysis/status');
+};

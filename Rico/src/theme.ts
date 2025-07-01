@@ -5,13 +5,17 @@ const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#f1e0c6', // Light skin tone color
+      main: '#f1e0c6',
     },
     secondary: {
-      main: '#212121', // Matte black color
+      main: '#212121',
     },
     background: {
-      default: '#f4f6f8', // Light background color
+      default: '#f4f6f8',
+    },
+    text: {
+      primary: '#212121',
+      secondary: '#555555',
     },
   },
 });

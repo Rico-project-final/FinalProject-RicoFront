@@ -1,5 +1,16 @@
+/**
+ * DueDateModal Component
+ * ----------------------
+ * A reusable modal dialog that allows users to select a due date.
+ * - Defaults to today's date if none is selected when opened.
+ * - Restricts the selectable date to today or later.
+ * - Includes Cancel and Confirm buttons.
+ * - Uses MUI's Dialog for styling and behavior.
+ */
+
 import React, { useEffect } from 'react';
 import { Dialog, Box, Typography, Button } from '@mui/material';
+
 
 interface DueDateModalProps {
   open: boolean;
@@ -19,12 +30,14 @@ const DueDateModal: React.FC<DueDateModalProps> = ({
   title = 'Select Due Date',
 }) => {
   useEffect(() => {
+    // If modal is opened and no due date is set
     if (open && !dueDate) {
       const today = new Date().toISOString().split('T')[0];
       setDueDate(today);
     }
   }, [open, dueDate, setDueDate]);
 
+  // Used to restrict date input to today or later
   const todayStr = new Date().toISOString().split('T')[0];
 
   return (
@@ -33,6 +46,8 @@ const DueDateModal: React.FC<DueDateModalProps> = ({
         <Typography variant="h6" sx={{ mb: 2 }}>
           {title}
         </Typography>
+
+        {/* Date input field with minimum selectable date set to today */}
         <input
           type="date"
           value={dueDate}
@@ -47,14 +62,16 @@ const DueDateModal: React.FC<DueDateModalProps> = ({
             marginBottom: '16px',
           }}
         />
+
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
           <Button onClick={onClose}>Cancel</Button>
+          {/* Confirm button is disabled unless a date is selected */}
           <Button
             variant="contained"
             onClick={() => onConfirm(dueDate)}
             disabled={!dueDate}
           >
-            Confirm
+            אישור
           </Button>
         </Box>
       </Box>

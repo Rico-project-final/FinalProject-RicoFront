@@ -89,7 +89,7 @@ const LandingPage: React.FC = () => {
             },
           }}
         >
-          {t("login")}
+          התחברות
         </Button>
       ):<Button
           onClick={logout}
@@ -109,7 +109,7 @@ const LandingPage: React.FC = () => {
             },
           }}
         >
-          {t("logout")}
+          התנתקות
         </Button>
 
     }
@@ -133,7 +133,7 @@ const LandingPage: React.FC = () => {
 
         {isAuthenticated && user?.name && (
           <Typography variant="h6" sx={{ mt: 2 }}>
-            {t('welcome')}, {user.name}!
+            ברוכים הבאים, {user.name}!
                       </Typography>
                     )}
                     {businessName && (

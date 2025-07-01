@@ -27,16 +27,17 @@ export type ReviewCategory = 'food' | 'service' | 'experience';
 
 export interface Review {
   _id: string;
-   userId?: string | {
-    _id: string;
-    name: string;
-    email: string;
-  };
   text: string;
-  category: ReviewCategory;
   createdAt: string;
-  updatedAt: string;
+  category?: ReviewCategory;
+  userId?: {
+    name: string;
+    email?: string;
+  } | null;
+  authorName?: string;
+  source: 'user' | 'google';
 }
+
 
 export interface ReviewForUser {
   _id: string;

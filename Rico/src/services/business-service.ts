@@ -12,3 +12,9 @@ export const generateBusinessQr = () => {
 export const sendResponseToCustomer = (email : string , text : string) => {
   return apiClient.post<{ message: string }>('/business/sendEmailResponse', {email,text});
 };
+
+export const getLastSyncDate = () => {
+  return apiClient.get<{ lastSyncDate: string }>('/business/lastSyncDate');
+};
+
+

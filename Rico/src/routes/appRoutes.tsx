@@ -14,6 +14,7 @@ import GreetingPage from '../pages/GreetingPage';
 import BusinessRegistrationPage from '../pages/BusinessRegistration';
 import CustomerProfilePage from '../pages/CustomerProfilePage';
 import VerifyEmailPage from '../pages/VerifyEmailPage';
+import GoogleBusinessCallback from '../pages/googleBusinessCallback';
 
 
 interface PrivateRouteProps {
@@ -42,6 +43,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/verifyEmail" element={<VerifyEmailPage />} />
       <Route path="/deniedAccess" element={<LoginPage />}/>
       <Route path="/GreetingPage" element={<GreetingPage />}/>
+      <Route path="/google-business-callback" element={<GoogleBusinessCallback />} />
       <Route path="/dashboard" element={
         <PrivateRoute>
            <AdminLayout>
