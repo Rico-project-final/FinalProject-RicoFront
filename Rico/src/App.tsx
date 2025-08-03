@@ -20,7 +20,7 @@ function AppWrapper() {
 
 // ✅ Main App component with dark/light theme support
 function App() {
-  const { mode, toggleTheme, theme } = useCustomTheme(); 
+  const { theme } = useCustomTheme(); 
 
   return (
     <ThemeProvider theme={theme}>

@@ -6,12 +6,11 @@ import DataCard from "../components/dataCard";
 import CommentsColumn from "../components/commentsColumn";
 import { ReviewAnalysis } from "../types";
 import { getAllReviewAnalyses } from "../services/reviewAnalaysis-service";
-import { CircularProgress } from "@mui/material";
 
 
 export const DataAnalysisPage: React.FC = () => {
   const theme = useTheme();
-  const { lang, t } = useLanguage();
+  const {  t } = useLanguage();
   const [reviewsAnalasys, setReviewsAnalasys] = useState<ReviewAnalysis[]>();
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -53,7 +52,7 @@ export const DataAnalysisPage: React.FC = () => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-        // direction: lang === "he" ? "rtl" : "ltr",
+
       }}
     >
       <Box component="main" sx={{ flex: 1, p: 4 }}>

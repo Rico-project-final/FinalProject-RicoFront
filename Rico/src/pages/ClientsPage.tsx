@@ -78,7 +78,7 @@ export const ClientsPage: React.FC = () => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-        direction: lang === "he" ? "rtl" : "ltr",
+        direction: "rtl" ,
         color: theme.palette.text.primary,
       }}
     >

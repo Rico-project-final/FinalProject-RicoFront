@@ -1,6 +1,6 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { ReviewAnalysis } from "../types";
 
 type DonutChartProps = {
@@ -25,9 +25,6 @@ const DonutChart: React.FC<DonutChartProps> = ({ reviews }) => {
     { name: "טוב", value: sentimentCounts.neutral },
     { name: "לא טוב", value: sentimentCounts.negative },
   ];
-
-  const total = chartData.reduce((sum, d) => sum + d.value, 0);
-  // if (total === 0) return <Typography textAlign="center">אין נתונים</Typography>;
 
   return (
     <Box sx={{ width: "100%", height: 200 }}

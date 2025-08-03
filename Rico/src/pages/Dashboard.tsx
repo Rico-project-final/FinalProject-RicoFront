@@ -1,14 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   Paper,
   Button,
-  Divider,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Link,
+  Divider
 } from "@mui/material";
 import {
   LineChart,
@@ -43,27 +39,7 @@ export const Dashboard: React.FC = () => {
       changeColor: string;
       changeText: keyof TranslationKeys;
     }>
-  >([
-    {
-      label: "totalClients",
-      icon: "👤",
-      changeColor: "green",
-      changeText: "upFromYesterday",
-    },
-    {
-      label: "totalTasks",
-      icon: "📈",
-      changeColor: "red",
-      changeText: "downFromYesterday",
-    },
-    {
-      label: "totalReviews",
-      icon: "💬",
-      changeColor: "green",
-      changeText: "upFromYesterday",
-    },
-  ]);
-  
+  >([]);
 
   const [totalStats, setTotalStats] = useState({
     totalReviews: 0,
@@ -88,7 +64,7 @@ export const Dashboard: React.FC = () => {
   const [oauthSuccess, setOauthSuccess] = useState<string | null>(null);
   const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
   const [googlePlaceId, setGooglePlaceId] = useState<string>("");
-
+  console.log(isConnecting,oauthError, oauthSuccess,googlePlaceId,)
   let oauthWindow: Window | null = null;
   // שלב ראשוני - לחיצה על התחברות לעסק
   const handleConnectBusiness = async (
@@ -164,7 +140,6 @@ export const Dashboard: React.FC = () => {
   }
 };
 
-
   const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
     setSelectedBusiness(place);
   };
@@ -202,6 +177,26 @@ export const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    setStats([
+    {
+      label: "totalClients",
+      icon: "👤",
+      changeColor: "green",
+      changeText: "upFromYesterday",
+    },
+    {
+      label: "totalTasks",
+      icon: "📈",
+      changeColor: "red",
+      changeText: "downFromYesterday",
+    },
+    {
+      label: "totalReviews",
+      icon: "💬",
+      changeColor: "green",
+      changeText: "upFromYesterday",
+    },
+  ]);
   const fetchDashboardData = async () => {
     try {
       const response = await getDashboardStats();
@@ -242,12 +237,13 @@ export const Dashboard: React.FC = () => {
 
   if (error) return <Typography color="error">{error}</Typography>;
 
+  //TODO :: Remove this func?
   function handleSyncReviews(): void {
     throw new Error("Function not implemented.");
   }
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction: lang === "he" ? "rtl" : "ltr" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction:  "rtl"}}>
       <Box sx={{ flex: 1, p: 4 }}>
         <Typography variant="h4" sx={{ mb: 3, color: theme.palette.text.primary }}>{t("dashboard")}</Typography>
 

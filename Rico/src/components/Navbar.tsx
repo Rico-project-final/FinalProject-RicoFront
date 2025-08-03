@@ -7,28 +7,18 @@ import {
   Avatar,
   useTheme,
   Button,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import BedtimeIcon from "@mui/icons-material/Bedtime";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import logo from "../assets/rico-logo.png";
-
-import { useLanguage } from "../context/language/LanguageContext";
 import { useAuth } from "../context/auth-context";
 import { useCustomTheme } from "../context/ThemeContext";
 
 export default function AppNavbar() {
   const theme = useTheme();
-  const { lang, setLang } = useLanguage();
   const { user } = useAuth();
+
   const { toggleTheme, mode } = useCustomTheme();
-
-  const handleLangChange = (event: SelectChangeEvent) => {
-    setLang(event.target.value as "he" | "en");
-  };
-
   const isDark = theme.palette.mode === "dark";
 
   return (
@@ -68,41 +58,7 @@ export default function AppNavbar() {
 
         {/* Right side controls */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {/* 🌐 Language Selector */}
-          <Select
-            value={lang}
-            onChange={handleLangChange}
-            size="small"
-            sx={{
-              backgroundColor: isDark ? theme.palette.background.default : "#fff",
-              borderRadius: 1,
-              fontSize: 14,
-              minWidth: 100,
-              height: 36,
-              color: isDark ? theme.palette.text.primary : "inherit",
-              ".MuiSelect-select": {
-                padding: "4px 12px",
-              },
-              "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDark ? theme.palette.divider : undefined,
-              },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDark ? theme.palette.primary.light : undefined,
-              },
-            }}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  bgcolor: isDark ? theme.palette.background.paper : "#fff",
-                  color: isDark ? theme.palette.text.primary : "inherit",
-                },
-              },
-            }}
-          >
-            <MenuItem value="he">עברית</MenuItem>
-            <MenuItem value="en">English</MenuItem>
-          </Select>
-
+          
           {/* 👤 User Info */}
           {user && (
             <Box

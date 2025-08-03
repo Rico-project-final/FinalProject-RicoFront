@@ -119,7 +119,7 @@ useEffect(() => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-        direction: lang === "he" ? "rtl" : "ltr",
+        direction:  "rtl"
       }}
     >
       <Container maxWidth="xl" sx={{ flex: 1, py: 4 }}>
@@ -206,6 +206,7 @@ useEffect(() => {
             overflow: "auto",
             bgcolor: theme.palette.background.paper,
             minHeight: "400px",
+            width : "100%",
             color: theme.palette.text.primary,
           }}
         >

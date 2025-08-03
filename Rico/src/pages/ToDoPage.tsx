@@ -97,7 +97,7 @@ export const ToDoPage: React.FC = () => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-        direction: lang === "he" ? "rtl" : "ltr",
+        direction:  "rtl",
         px: 4,
         py: 4,
         color: theme.palette.text.primary,

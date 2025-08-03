@@ -1,5 +1,5 @@
 import { User } from '../types';
-import apiClient, { CanceledError } from './axios'; // Use your configured Axios client
+import apiClient from './axios'; // Use your configured Axios client
 
 // Define auth data structure
 interface AuthData {
