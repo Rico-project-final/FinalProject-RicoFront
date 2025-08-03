@@ -135,25 +135,13 @@ const Sidebar: React.FC = () => {
       </List>
 
       <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
-      <Typography
-        variant="caption"
-        sx={{
-          px: 2,
-          py: 1,
-          color: isDark ? theme.palette.text.secondary : '#888',
-          fontWeight: 500,
-          letterSpacing: 1,
-        }}
-      >
-        PAGES
-      </Typography>
       <List>
         {pagesMenuItems.map((item) => (
           <MenuItem key={item.id} item={item} isActive={activeItem === item.id} />
         ))}
       </List>
 
-      <Box sx={{ flexGrow: 1 }} />
+      <Box />
       <Divider sx={{ my: 2, backgroundColor: isDark ? theme.palette.divider : '#f3f1e7' }} />
       <List>
         {bottomMenuItems.map((item) => (

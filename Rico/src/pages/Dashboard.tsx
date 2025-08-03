@@ -243,7 +243,7 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction:  "rtl"}}>
+    <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction:  "rtl", flex:1}}>
       <Box sx={{ flex: 1, p: 4 }}>
         <Typography variant="h4" sx={{ mb: 3, color: theme.palette.text.primary }}>{t("dashboard")}</Typography>
 
@@ -296,7 +296,7 @@ export const Dashboard: React.FC = () => {
             {qrImage && (
               <>
                 <img src={qrImage} alt="QR Code" style={{ marginTop: 16, width: 200, height: 200 }} />
-                <Button onClick={() => { const link = document.createElement("a"); link.href = qrImage; link.download = "business-qr.png"; link.click(); }} variant="outlined">הורד QR</Button>
+                <Button sx={{color:"black" , borderColor:"black"}} onClick={() => { const link = document.createElement("a"); link.href = qrImage; link.download = "business-qr.png"; link.click(); }} variant="outlined">הורד QR</Button>
               </>
             )}
           </Paper>

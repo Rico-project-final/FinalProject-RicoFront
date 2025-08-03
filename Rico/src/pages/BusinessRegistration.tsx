@@ -21,6 +21,7 @@ const BusinessRegistrationPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const {
+    error,
     user,
     registerBusiness,
     isLoading,
@@ -45,14 +46,14 @@ const BusinessRegistrationPage: React.FC = () => {
     companyName: "",
   });
 
-  const validateForm = () => {
+  const validateForm = (isGoogle : boolean) => {
     const errors: any = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{7,15}$/;
 
     if (!form.name.trim()) errors.name = "Name is required";
-    if (!form.email.trim()) errors.email = "Email is required";
-    else if (!emailRegex.test(form.email)) errors.email = "Invalid email format";
+    if (!form.email.trim() && !isGoogle) errors.email = "Email is required";
+    else if (!emailRegex.test(form.email)&& !isGoogle) errors.email = "Invalid email format";
     if (!form.password.trim()) errors.password = "Password is required";
     else if (form.password.length < 6) errors.password = "Password must be at least 6 characters";
     if (!form.phone.trim()) errors.phone = "Phone is required";
@@ -71,7 +72,7 @@ const BusinessRegistrationPage: React.FC = () => {
 
   const handleSubmit = async () => {
   clearError();
-  if (!validateForm()) return;
+  if (!validateForm(false)) return;
 
   try {
     await registerBusiness(
@@ -94,11 +95,12 @@ const BusinessRegistrationPage: React.FC = () => {
   }
 };
 const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
+  clearError();
   try {
     clearError();
     const credential = credentialResponse.credential;
 
-    if (!validateForm()) return;
+    if (!validateForm(true)) return;
 
     await registerBusinessWithGoogle(
       credential,
@@ -110,7 +112,6 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
     navigate('/dashboard');
   } catch (err) {
     console.error("Google Sign-up failed:", err);
-    alert("Google Sign-up failed");
   }
 };
 
@@ -461,6 +462,19 @@ const handleGoogleSignUpSuccess = async (credentialResponse: any) => {
           gap: 3,
         }}
       >
+        {error && <Box
+  role="alert"
+  sx={{
+    backgroundColor: "#fdecea",
+    color: "#611a15",
+    padding: 2,
+    border: "1px solid #f5c6cb",
+    borderRadius: 1,
+    marginY: 2,
+  }}
+>
+  {error}
+</Box>}
         <TextField
           name="name"
           label="שם מלא"

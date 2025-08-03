@@ -114,10 +114,11 @@ export const ImprovementSuggestionsPage: React.FC = () => {
         px: 4,
         py: 4,
         color: theme.palette.text.primary,
+        flex :1
       }}
     >
       <Box sx={{ flex: 1 }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ mb: 3 , textAlign:"center" }}>
           הצעות לשיפור
         </Typography>
 

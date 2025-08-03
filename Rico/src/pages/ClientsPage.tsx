@@ -21,7 +21,7 @@ import { User } from "../types";
 
 export const ClientsPage: React.FC = () => {
   const theme = useTheme();
-  const { lang, t } = useLanguage();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -80,6 +80,7 @@ export const ClientsPage: React.FC = () => {
         bgcolor: theme.palette.background.default,
         direction: "rtl" ,
         color: theme.palette.text.primary,
+        flex:1
       }}
     >
       <Box sx={{ flex: 1, p: 4 }}>
@@ -92,6 +93,7 @@ export const ClientsPage: React.FC = () => {
           onChange={(e) => setSearch(e.target.value)}
           sx={{
             mb: 3,
+            maxWidth : "50%",
             bgcolor: theme.palette.mode === "dark" ? "#303030" : "white",
             borderRadius: 1,
             input: { color: theme.palette.text.primary },

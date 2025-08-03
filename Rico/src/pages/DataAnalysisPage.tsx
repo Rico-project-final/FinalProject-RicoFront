@@ -52,14 +52,14 @@ export const DataAnalysisPage: React.FC = () => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-
+        flex: 1
       }}
     >
-      <Box component="main" sx={{ flex: 1, p: 4 }}>
+      <Box component="main" sx={{ p: 4 }}>
         {/* Title */}
         <Typography
           variant="h4"
-          sx={{ mb: 3, color: theme.palette.text.primary }}
+          sx={{ mb: 3, color: theme.palette.text.primary ,textAlign:"center"}}
         >
           {t("dataAnalysis")}
         </Typography>

@@ -119,7 +119,8 @@ useEffect(() => {
         height: "100vh",
         overflowY: "auto",
         bgcolor: theme.palette.background.default,
-        direction:  "rtl"
+        direction:  "rtl",
+        flex:1
       }}
     >
       <Container maxWidth="xl" sx={{ flex: 1, py: 4 }}>
@@ -129,6 +130,7 @@ useEffect(() => {
             display: "flex",
             gap: 2,
             alignItems: "center",
+            justifyContent : "flex-start",
             mb: 2,
             flexWrap: "nowrap",
             overflowX: "auto",
@@ -148,7 +150,6 @@ useEffect(() => {
             inputProps={{ style: { fontWeight: "bold", fontSize: 14 } }}
           />
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <InputBase
               type="date"
               value={dateFilter || ""}
@@ -162,7 +163,7 @@ useEffect(() => {
               placeholder="Select date"
               inputProps={{ max: today }}
             />
-          </Box>
+
 
           <Button
             variant="outlined"
@@ -183,8 +184,8 @@ useEffect(() => {
               ...filterBtnSx,
               color: "#d44",
               borderColor: "#d44",
-              ml: lang === "en" ? 0 : "auto",
-              mr: lang === "he" ? 0 : "auto",
+              // ml:  "auto",
+              // mr: lang === "he" ? 0 : "auto",
             }}
           >
             {t("resetFilter")}

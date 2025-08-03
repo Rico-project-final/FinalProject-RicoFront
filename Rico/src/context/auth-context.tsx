@@ -158,6 +158,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       );
       const response = await request;
+      console.log(response.data)
       authService.saveAuth(response.data);
       setUser(response.data.user);
     } catch (err: any) {

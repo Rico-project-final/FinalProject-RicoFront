@@ -101,9 +101,10 @@ export const ToDoPage: React.FC = () => {
         px: 4,
         py: 4,
         color: theme.palette.text.primary,
+        flex:1
       }}
     >
-      <Typography variant="h4" sx={{ mb: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3, textAlign:"center" }}>
         {t("todo")}
       </Typography>
 
