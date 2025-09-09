@@ -73,20 +73,6 @@ export const ToDoPage: React.FC = () => {
     await deleteTask(id);
   };
 
-  // Adjust priority colors for dark mode
-  const getPriorityColor = (priority?: string) => {
-    const mode = theme.palette.mode;
-    switch ((priority || "medium").toLowerCase()) {
-      case "high":
-        return mode === "dark" ? "#663333" : "#ffcccc"; // darker red in dark mode
-      case "medium":
-        return mode === "dark" ? "#665e33" : "#fff4cc"; // darker yellow in dark mode
-      case "low":
-        return mode === "dark" ? "#335d33" : "#d5f5e3"; // darker green in dark mode
-      default:
-        return mode === "dark" ? theme.palette.background.paper : "#f0f0f0";
-    }
-  };
 
   return (
     <Box
@@ -138,11 +124,16 @@ export const ToDoPage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {taskList.map((task) => (
+            {taskList.sort((t1, t2) => {
+                if (!t1.dueDate) return 1;
+                if (!t2.dueDate) return -1;
+                const d1 = new Date(t1.dueDate).getTime();
+                const d2 = new Date(t2.dueDate).getTime();
+                return d1 - d2;
+              }).map((task) => (
               <TableRow
                 key={task._id}
-                sx={{ backgroundColor: getPriorityColor(task.priority) }}
-              >
+                >
                 <TableCell sx={bodyCellSx} align="center">
                   {task.title}
                 </TableCell>

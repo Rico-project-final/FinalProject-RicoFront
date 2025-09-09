@@ -22,10 +22,10 @@ import { getDashboardStats } from "../services/user-service";
 import { Review, ReviewAnalysis } from "../types";
 import CommentModal from "../components/commentModal";
 import { getAllReviewAnalysesNoPage } from "../services/reviewAnalaysis-service";
-import GoogleMapSearch from "../components/GoogleMapSearch";
-import GoogleIcon from "@mui/icons-material/Google";
 import { generateBusinessQr} from '../services/business-service';
-import { connectGoogleBusiness, checkGoogleConnection } from "../services/googleBusiness-service";
+// import GoogleMapSearch from "../components/GoogleMapSearch";
+// import GoogleIcon from "@mui/icons-material/Google";
+// import { connectGoogleBusiness, checkGoogleConnection } from "../services/googleBusiness-service";
 
 
 export const Dashboard: React.FC = () => {
@@ -59,90 +59,90 @@ export const Dashboard: React.FC = () => {
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
 
   // סטייטים לתהליך OAuth
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [oauthError, setOauthError] = useState<string | null>(null);
-  const [oauthSuccess, setOauthSuccess] = useState<string | null>(null);
-  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
-  const [googlePlaceId, setGooglePlaceId] = useState<string>("");
-  // console.log(isConnecting,oauthError, oauthSuccess,googlePlaceId,)
-  let oauthWindow: Window | null = null;
-  // שלב ראשוני - לחיצה על התחברות לעסק
-  const handleConnectBusiness = async (
-    place: google.maps.places.PlaceResult
-  ) => {
-    setSelectedBusiness(place);
-    setIsConnecting(true);
-    setOauthError(null);
-    setOauthSuccess(null);
+  // const [isConnecting, setIsConnecting] = useState(false);
+  // const [oauthError, setOauthError] = useState<string | null>(null);
+  // const [oauthSuccess, setOauthSuccess] = useState<string | null>(null);
+  // const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
+  // const [googlePlaceId, setGooglePlaceId] = useState<string>("");
+  // // console.log(isConnecting,oauthError, oauthSuccess,googlePlaceId,)
+  // let oauthWindow: Window | null = null;
+  // // שלב ראשוני - לחיצה על התחברות לעסק
+  // const handleConnectBusiness = async (
+  //   place: google.maps.places.PlaceResult
+  // ) => {
+  //   setSelectedBusiness(place);
+  //   setIsConnecting(true);
+  //   setOauthError(null);
+  //   setOauthSuccess(null);
 
-    const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
-    const redirectUri = `${window.location.origin}/google-business-callback`;
+  //   const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
+  //   const redirectUri = `${window.location.origin}/google-business-callback`;
 
-    const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-      redirectUri
-    )}&response_type=code&scope=https://www.googleapis.com/auth/business.manage&access_type=offline&prompt=consent`;
+  //   const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+  //     redirectUri
+  //   )}&response_type=code&scope=https://www.googleapis.com/auth/business.manage&access_type=offline&prompt=consent`;
 
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.innerWidth - width) / 2;
-    const top = window.screenY + (window.innerHeight - height) / 2;
+  //   const width = 500;
+  //   const height = 600;
+  //   const left = window.screenX + (window.innerWidth - width) / 2;
+  //   const top = window.screenY + (window.innerHeight - height) / 2;
 
-    oauthWindow = window.open(
-      oauthUrl,
-      "_blank",
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+  //   oauthWindow = window.open(
+  //     oauthUrl,
+  //     "_blank",
+  //     `width=${width},height=${height},left=${left},top=${top}`
+  //   );
 
-    if (!oauthWindow) {
-      setIsConnecting(false);
-      setOauthError("לא הצלחנו לפתוח את חלון ההתחברות");
-      return;
-    }
-        }
+  //   if (!oauthWindow) {
+  //     setIsConnecting(false);
+  //     setOauthError("לא הצלחנו לפתוח את חלון ההתחברות");
+  //     return;
+  //   }
+  //       }
 
     // מאזין לאירוע postMessage מהחלון שנפתח (callback)
-  const handleMessage = async (event: MessageEvent) => {
-  // בדיקת מקור להבטחת אבטחה
-  if (event.origin !== window.location.origin) return;
+//   const handleMessage = async (event: MessageEvent) => {
+//   // בדיקת מקור להבטחת אבטחה
+//   if (event.origin !== window.location.origin) return;
 
-  const { data } = event;
-  if (data.type === "google-oauth-code" && data.code) {
-    // סגירת חלון ההתחברות והסרת מאזין
-    if (oauthWindow) {
-      oauthWindow.close();
-    }
-    window.removeEventListener("message", handleMessage);
+//   const { data } = event;
+//   if (data.type === "google-oauth-code" && data.code) {
+//     // סגירת חלון ההתחברות והסרת מאזין
+//     if (oauthWindow) {
+//       oauthWindow.close();
+//     }
+//     window.removeEventListener("message", handleMessage);
 
-    if (!selectedBusiness?.place_id) {
-      alert("מזהה העסק בגוגל לא זמין.");
-      return;
-    }
+//     if (!selectedBusiness?.place_id) {
+//       alert("מזהה העסק בגוגל לא זמין.");
+//       return;
+//     }
 
-    try {
-      setIsConnecting(true);
+//     try {
+//       setIsConnecting(true);
 
-      const response = await connectGoogleBusiness(data.code, selectedBusiness.place_id);
+//       const response = await connectGoogleBusiness(data.code, selectedBusiness.place_id);
 
-      // בדיקה אם הבקשה הצליחה
-      if (response.status === 200) {
-        setOauthSuccess("התחברת בהצלחה לעסק!");
-        setIsGoogleConnected(true);
-        setGooglePlaceId(selectedBusiness.place_id);
-      } else {
-        setOauthError("אירעה שגיאה בהתחברות לעסק.");
-      }
-    } catch (err) {
-      console.error("OAuth Error:", err);
-      setOauthError("אירעה שגיאה בהתחברות לגוגל עסקי.");
-    } finally {
-      setIsConnecting(false);
-    }
-  }
-};
+//       // בדיקה אם הבקשה הצליחה
+//       if (response.status === 200) {
+//         setOauthSuccess("התחברת בהצלחה לעסק!");
+//         setIsGoogleConnected(true);
+//         setGooglePlaceId(selectedBusiness.place_id);
+//       } else {
+//         setOauthError("אירעה שגיאה בהתחברות לעסק.");
+//       }
+//     } catch (err) {
+//       console.error("OAuth Error:", err);
+//       setOauthError("אירעה שגיאה בהתחברות לגוגל עסקי.");
+//     } finally {
+//       setIsConnecting(false);
+//     }
+//   }
+// };
 
-  const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
-    setSelectedBusiness(place);
-  };
+  // const handlePlaceSelected = (place: google.maps.places.PlaceResult) => {
+  //   setSelectedBusiness(place);
+  // };
 
   const handleGenerateQR = async () => {
     try {
@@ -218,29 +218,29 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const fetchConnectionStatus = async () => {
-    try {
-      const res = await checkGoogleConnection();
-      setIsGoogleConnected(res.data.isGoogleConnected);
-      console.log("Google connection status:", res.data.isGoogleConnected);
-      console.log("res:", res.status);
-    } catch (error) {
-      console.error("Error checking Google connection:", error);
-    }
-  };
+  // const fetchConnectionStatus = async () => {
+  //   try {
+  //     const res = await checkGoogleConnection();
+  //     setIsGoogleConnected(res.data.isGoogleConnected);
+  //     console.log("Google connection status:", res.data.isGoogleConnected);
+  //     console.log("res:", res.status);
+  //   } catch (error) {
+  //     console.error("Error checking Google connection:", error);
+  //   }
+  // };
 
   fetchDashboardData();
   fetchReviews();
-  fetchConnectionStatus();
+  // fetchConnectionStatus();
 }, []);
 
 
   if (error) return <Typography color="error">{error}</Typography>;
 
-  //TODO :: Remove this func?
-  function handleSyncReviews(): void {
-    throw new Error("Function not implemented.");
-  }
+  // //TODO :: Remove this func?
+  // function handleSyncReviews(): void {
+  //   throw new Error("Function not implemented.");
+  // }
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", backgroundColor: theme.palette.background.default, direction:  "rtl", flex:1}}>
@@ -300,7 +300,7 @@ export const Dashboard: React.FC = () => {
               </>
             )}
           </Paper>
-      {!isGoogleConnected ? (
+      {/* {!isGoogleConnected ? (
   <Box sx={{ mt: 4 }}>
     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
       <GoogleIcon sx={{ color: '#4285F4', fontSize: 28 }} />
@@ -333,7 +333,7 @@ export const Dashboard: React.FC = () => {
     </Button>
     
   </Paper>
-)}
+)} */}
 
       </Box>
       </Box>
