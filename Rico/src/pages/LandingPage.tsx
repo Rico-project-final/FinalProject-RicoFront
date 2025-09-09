@@ -45,19 +45,29 @@ const LandingPage: React.FC = () => {
       }
     }, [user, loginOpen, navigate]);
 
-  const handleSubmitFeedback = async () => {
-    try {
-      if(businessId) {
-      await createReview({ text: reviewText , businessId: businessId });
-      }else {
-        alert('Business ID is not provided');
-        return;
-      }
-      navigate('/GreetingPage');
-    } catch (err) {
-      console.error('Failed to submit review:', err);
+  const normalizeText = (text: string): string => {
+  return text
+    .replace(/[^\w\sא-ת]/g, "") // remove special characters (keeps letters, numbers, whitespace, Hebrew)
+    .replace(/\s+/g, " ")       // collapse multiple spaces into one
+    .trim();                    // remove leading/trailing spaces
+};
+
+const handleSubmitFeedback = async () => {
+  try {
+    if (businessId) {
+      // ✅ Normalize before sending
+      const cleanedText = normalizeText(reviewText);
+
+      await createReview({ text: cleanedText, businessId });
+    } else {
+      alert("Business ID is not provided");
+      return;
     }
-  };
+    navigate("/GreetingPage");
+  } catch (err) {
+    console.error("Failed to submit review:", err);
+  }
+};
 
   return (
     <Box

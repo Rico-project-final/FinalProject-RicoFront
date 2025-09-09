@@ -55,7 +55,7 @@ const VerifyEmailPage = () => {
       {status === 'loading' && (
         <>
           <CircularProgress />
-          <Typography mt={2}>Verifying your email...</Typography>
+          <Typography mt={2}>מאמת את האימייל...</Typography>
         </>
       )}
       {status !== 'loading' && (

@@ -78,10 +78,11 @@ const BusinessRegistrationPage: React.FC = () => {
     await registerBusiness(
       form.email,
       form.password,
-      form.companyName,
       form.name,
+      form.companyName,
       form.phone
     );
+    alert(`אנא היכנס לאימייל ${name} על מנת לאמת את המשתמש`)
   } catch (err: any) {
     console.error("Register failed:", err);
 
