@@ -37,6 +37,6 @@ export const triggerAllReviewAnalyses = () => {
   return apiClient.post("/reviews/triggerAll")
 };
 // GET /reviews/getByUser (user only)
-export const getReviewsByUser = () => {
-  return apiClient.get<ReviewForUser[]>('/reviews/getByUser');
+export const getReviewsByUser = (userId: string) => {
+  return apiClient.get<any>(`/reviews/getByUser/${userId}`);
 };

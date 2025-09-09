@@ -47,7 +47,7 @@ const authService = {
 },
 
 // Register a new business
-registerBusiness(data: { email: string; password: string; name: string; companyName: string , phone?:string}): ApiRequest {
+registerBusiness(data: { email: string; password: string; companyName: string; name: string , phone?:string}): ApiRequest {
   return this.createCancellableRequest('/auth/registerBusiness', 'POST', data);
 },
 

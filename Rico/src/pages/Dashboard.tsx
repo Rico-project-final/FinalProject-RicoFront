@@ -64,7 +64,7 @@ export const Dashboard: React.FC = () => {
   const [oauthSuccess, setOauthSuccess] = useState<string | null>(null);
   const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
   const [googlePlaceId, setGooglePlaceId] = useState<string>("");
-  console.log(isConnecting,oauthError, oauthSuccess,googlePlaceId,)
+  // console.log(isConnecting,oauthError, oauthSuccess,googlePlaceId,)
   let oauthWindow: Window | null = null;
   // שלב ראשוני - לחיצה על התחברות לעסק
   const handleConnectBusiness = async (

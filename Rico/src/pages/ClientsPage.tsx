@@ -64,7 +64,7 @@ export const ClientsPage: React.FC = () => {
   };
 
   const filteredClients = users.filter((c) =>
-    [c.name, c.email, c._id, c.phone ?? ""].some((field) =>
+    [c.name, c.email, c.id, c.phone ?? ""].some((field) =>
       field?.toLowerCase().includes(search.toLowerCase())
     )
   );
@@ -129,9 +129,9 @@ export const ClientsPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {filteredClients.map((c) => (
-                <TableRow key={c._id}>
+                <TableRow key={c.id}>
                   <TableCell sx={bodyCellSx} align="center">
-                    {c._id.slice(-6)}
+                    {c._id!.slice(-6)}
                   </TableCell>
                   <TableCell sx={bodyCellSx} align="center">
                     {c.email}

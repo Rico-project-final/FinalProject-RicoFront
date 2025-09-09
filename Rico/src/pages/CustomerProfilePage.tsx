@@ -27,9 +27,9 @@ const CustomerProfilePage: React.FC = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await getReviewsByUser();
-      setReviews(response.data);
-      setFilteredReviews(response.data);
+      const response = await getReviewsByUser(user?.id!);
+      setReviews(response.data.reviews);
+      setFilteredReviews(response.data.reviews);
     } catch (error) {
       console.error("Failed to fetch reviews", error);
     }

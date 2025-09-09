@@ -33,6 +33,9 @@ const LandingPage: React.FC = () => {
     fetchBusiness();
     }, [businessId]);
     useEffect(() => {
+      if(!isAuthenticated){
+        setLoginOpen(true);
+      }
       if (user) {
         if (user.role === 'admin') {
           navigate('/dashboard');

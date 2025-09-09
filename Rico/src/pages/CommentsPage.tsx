@@ -105,6 +105,7 @@ export const CommentsPage: React.FC = () => {
 
   const handleAllReviewAnalysis = async () => {
     await triggerAllReviewAnalyses();
+    alert("התגובות נשלחו לניתוח- תהליך זה עלול לקחת מס' דקות")
   };
 
 useEffect(() => {

@@ -126,8 +126,11 @@ export const ToDoPage: React.FC = () => {
               <TableCell sx={headCellSx} align="center">
                 {t("status")}
               </TableCell>
-              <TableCell sx={headCellSx} align="center">
+              {/* <TableCell sx={headCellSx} align="center">
                 {t("priority")}
+              </TableCell> */}
+              <TableCell sx={headCellSx} align="center">
+                {"תאריך סיום"}
               </TableCell>
               <TableCell sx={headCellSx} align="center">
                 {t("actions")}
@@ -146,8 +149,11 @@ export const ToDoPage: React.FC = () => {
                 <TableCell sx={bodyCellSx} align="center">
                   {t(task.isCompleted ? "done" : "notDone")}
                 </TableCell>
+                {/* <TableCell sx={bodyCellSx} align="center">
+                  {t(task.priority!)}
+                </TableCell> */}
                 <TableCell sx={bodyCellSx} align="center">
-                  {t(task.priority ?? "medium")}
+                  {new Date(task.dueDate!).toLocaleDateString("en-GB").replace(/-/g, "/")}
                 </TableCell>
                 <TableCell sx={bodyCellSx} align="center">
                   <Checkbox
